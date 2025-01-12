@@ -33,6 +33,16 @@ public class TextCursor
     }
 
     /// <summary>
+    /// Text[point; this.Location) or Text[this.Location; point)  
+    /// </summary>
+    public ReadOnlyMemory<char> Slice(Location point)
+    {
+        if (point.AbsoluteIndex > _location.AbsoluteIndex)
+            return Slice(Location, point);
+        return Slice(point, Location);
+    }
+    
+    /// <summary>
     /// Text[start; end)
     /// </summary>
     public ReadOnlyMemory<char> Slice(Location start, Location end)

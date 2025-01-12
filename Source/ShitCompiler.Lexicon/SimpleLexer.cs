@@ -7,6 +7,13 @@ namespace ShitCompiler.Lexicon;
 public class SimpleLexer: ILexer
 {
     private TextCursor _textCursor;
+    private Dictionary<string, LexemeKind> _keywords = new(){
+        { "if" ,  LexemeKind.IfKeyword },
+        { "else" ,  LexemeKind.ElseKeyword },
+        { "var", LexemeKind.VarKeyword },
+        { "val" ,  LexemeKind.ValKeyword },
+    };
+    
     
     public SimpleLexer(TextCursor textCursor)
     {
@@ -22,7 +29,7 @@ public class SimpleLexer: ILexer
         {
             case '\"':
             case '\'':
-                return this.ScanStringLiteral();
+                return ScanStringLiteral();
             case '/':
                 _textCursor.Advance();
                 if (_textCursor.TryAdvance('/') || _textCursor.TryAdvance('*'))
@@ -136,7 +143,7 @@ public class SimpleLexer: ILexer
                 {
                     return new Lexeme(
                         LexemeKind.Unknown,
-                        _textCursor.Slice(startingPosition, _textCursor.Location),
+                        _textCursor.Slice(startingPosition),
                         startingPosition
                     );
                 }
@@ -145,7 +152,7 @@ public class SimpleLexer: ILexer
         
         return new Lexeme(
             kind,
-            _textCursor.Slice(startingPosition, _textCursor.Location),
+            _textCursor.Slice(startingPosition),
             startingPosition
         );
     }
@@ -154,10 +161,36 @@ public class SimpleLexer: ILexer
     {
         throw new NotImplementedException();
     }
-
+    
     private Lexeme ScanIdentifierOrKeyword()
     {
-        throw new NotImplementedException();
+        Location starting = _textCursor.Location;
+        char character = _textCursor.PeekChar();
+        while (IsIdentifierCharacter(character))
+        {
+            character = _textCursor.NextChar();   
+        }
+        
+        string text = _textCursor.Slice(starting).ToString();
+        
+        LexemeKind kind = _keywords.GetValueOrDefault(
+            text,
+            LexemeKind.IdentifierToken
+        );
+        
+        return new Lexeme(
+            kind,
+            text.AsMemory(),
+            starting
+        );
+    }
+
+    private bool IsIdentifierCharacter(char character)
+    {
+        return character 
+            is (>= 'a' and <= 'z') 
+            or (>= 'A' and <= 'Z') 
+            or (>= '0' and <= '9' or '_');
     }
 
     private InvalidLexeme? SkipComment()
@@ -224,7 +257,7 @@ public class SimpleLexer: ILexer
             {
                 return new InvalidLexeme(
                     ErrorCode.IncompleteToken,
-                    _textCursor.Slice(startingPosition, _textCursor.Location),
+                    _textCursor.Slice(startingPosition),
                     startingPosition
                 );
             }
@@ -232,7 +265,7 @@ public class SimpleLexer: ILexer
             
             builder.Append(ch);
         }
-        ReadOnlyMemory<char> value = _textCursor.Slice(startingPosition, _textCursor.Location);
+        ReadOnlyMemory<char> value = _textCursor.Slice(startingPosition);
         
         //У символа строго ограниченная длина
         
