@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using ShitCompiler.Lexicon.Exceptions;
 
@@ -71,6 +72,17 @@ public class SimpleLexer: ILexer
             case '.':
                 _textCursor.Advance();
                 kind = LexemeKind.DotToken;
+                if (char.IsDigit(_textCursor.PeekChar()))
+                {
+                    while (char.IsDigit(_textCursor.PeekChar()))
+                        _textCursor.Advance();
+                    
+                    return new InvalidLexeme(
+                        ErrorCode.UnknownCharactersSequence, 
+                        _textCursor.Slice(startingPosition), 
+                        startingPosition
+                    );
+                }
                 break;
             case '+':
                 _textCursor.Advance();
@@ -159,17 +171,56 @@ public class SimpleLexer: ILexer
 
     private Lexeme ScanNumericLiteral()
     {
-        throw new NotImplementedException();
+        bool isReal = false;
+        Location startingPosition = _textCursor.Location;
+        char character = _textCursor.PeekChar();
+
+        while (char.IsDigit(character) || character == '.')
+        {
+            if (character == '.')
+                isReal = true;
+            character = _textCursor.NextChar();
+        }
+
+        ReadOnlyMemory<char> value = _textCursor.Slice(startingPosition);
+
+        if (isReal)
+        {
+            if (double.TryParse(value.Span, CultureInfo.InvariantCulture, out double parsed))
+            {
+                return new Lexeme<double>(
+                    LexemeKind.RealNumberToken,
+                    value,
+                    startingPosition,
+                    parsed
+                );
+            }
+        }
+        else if (ulong.TryParse(value.Span, out ulong parsed))
+        {
+            return new Lexeme<ulong>(
+                LexemeKind.NumberToken,
+                value,
+                startingPosition,
+                parsed
+            );
+        }
+
+
+        return new InvalidLexeme(
+            ErrorCode.UnknownCharactersSequence,
+            _textCursor.Slice(startingPosition),
+            startingPosition
+        );
     }
     
     private Lexeme ScanIdentifierOrKeyword()
     {
         Location starting = _textCursor.Location;
         char character = _textCursor.PeekChar();
+        
         while (IsIdentifierCharacter(character))
-        {
             character = _textCursor.NextChar();   
-        }
         
         string text = _textCursor.Slice(starting).ToString();
         
@@ -227,8 +278,10 @@ public class SimpleLexer: ILexer
     
     private void SkipWhiteSpaces()
     {
-        while (char.IsWhiteSpace(_textCursor.PeekChar()))
-            _textCursor.Advance();
+        char character = _textCursor.PeekChar();
+        while (char.IsWhiteSpace(character) || character == '\n' || character == '\r' || character == '\t')
+            character = _textCursor.NextChar();
+
     }
 
     private Lexeme ScanStringLiteral()

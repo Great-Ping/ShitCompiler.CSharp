@@ -19,9 +19,13 @@ public enum LexemeKind
     /// </summary>
     StringLiteral,
     /// <summary>
-    /// Some Number
+    /// Some Number 12312
     /// </summary>
     NumberToken,
+    /// <summary>
+    /// Some Real Number 0.000
+    /// </summary>
+    RealNumberToken,
     /// <summary>
     /// Some Character
     /// </summary>

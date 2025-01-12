@@ -8,6 +8,11 @@ class Program
     static void Main(string[] args)
     {
         string testInput = """
+                           0.000
+                           .0000
+                           0.1000
+                           00.00.00
+                           132424
                            :
                            var abs = abstrd;
                            
@@ -31,7 +36,7 @@ class Program
         Console.WriteLine(testInput);
         TextCursor cursor = new(testInput.AsMemory());
         ILexer lexer = new SimpleLexer(cursor);
-
+        
         while (true)
         {
             Lexeme lexeme = lexer.ScanNext();
