@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Source\ShitCompiler.Lexicon\ShitCompiler.Lexicon.csproj" />
+      <ProjectReference Include="..\ShitCompiler.Lexicon\ShitCompiler.Lexicon.csproj" />
     </ItemGroup>
 
 </Project>
