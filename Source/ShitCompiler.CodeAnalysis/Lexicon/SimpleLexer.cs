@@ -1,18 +1,20 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
-using ShitCompiler.Lexicon.Exceptions;
+using ShitCompiler.CodeAnalysis.Errors;
+using ShitCompiler.CodeAnalysis.Lexicon.Errors;
+using ShitCompiler.CodeAnalysis.Syntax;
 
-namespace ShitCompiler.Lexicon;
+namespace ShitCompiler.CodeAnalysis.Lexicon;
 
 public class SimpleLexer: ILexer
 {
     private TextCursor _textCursor;
-    private Dictionary<string, LexemeKind> _keywords = new(){
-        { "if" ,  LexemeKind.IfKeyword },
-        { "else" ,  LexemeKind.ElseKeyword },
-        { "var", LexemeKind.VarKeyword },
-        { "val" ,  LexemeKind.ValKeyword },
+    private Dictionary<string, SyntaxKind> _keywords = new(){
+        { "if" ,  SyntaxKind.IfKeyword },
+        { "else" ,  SyntaxKind.ElseKeyword },
+        { "var", SyntaxKind.VarKeyword },
+        { "val" ,  SyntaxKind.ValKeyword },
     };
     
     
@@ -21,11 +23,11 @@ public class SimpleLexer: ILexer
         _textCursor = textCursor;
     }
 
-    public Lexeme ScanNext()
+    public ParseResult<Lexeme> ScanNext()
     {   
         SkipWhiteSpaces();
         Location startingPosition = _textCursor.Location;
-        LexemeKind kind = LexemeKind.Unknown;
+        SyntaxKind kind = SyntaxKind.Unknown;
         switch(_textCursor.PeekChar())
         {
             case '\"':
@@ -36,116 +38,115 @@ public class SimpleLexer: ILexer
                 if (_textCursor.TryAdvance('/') || _textCursor.TryAdvance('*'))
                 {
                     _textCursor.Reset(startingPosition);
-                    InvalidLexeme? lexeme = SkipComment();
-                    return lexeme ?? ScanNext();
+                    //Игнорируются только правильные комментарии,
+                    //если в комментарии ошибка, то она всплывает
+                    return SkipComment() ?? ScanNext();
                 }
-                kind = LexemeKind.SlashToken;
+                kind = SyntaxKind.SlashToken;
                 break;
             case '(':
                 _textCursor.Advance();
-                kind = LexemeKind.OpenParenToken;
+                kind = SyntaxKind.OpenParenToken;
                 break;
             case ')':
                 _textCursor.Advance();
-                kind = LexemeKind.CloseParenToken;
+                kind = SyntaxKind.CloseParenToken;
                 break;
             case '{':
                 _textCursor.Advance();
-                kind = LexemeKind.OpenBraceToken;
+                kind = SyntaxKind.OpenBraceToken;
                 break;
             case '}':
                 _textCursor.Advance();
-                kind = LexemeKind.CloseBraceToken;
+                kind = SyntaxKind.CloseBraceToken;
                 break;
             case '[':
                 _textCursor.Advance();
-                kind = LexemeKind.OpenBracketToken;
+                kind = SyntaxKind.OpenBracketToken;
                 break;
             case ']':
                 _textCursor.Advance();
-                kind = LexemeKind.CloseBracketToken;
+                kind = SyntaxKind.CloseBracketToken;
                 break;
             case ',':
                 _textCursor.Advance();
-                kind = LexemeKind.CommaToken;
+                kind = SyntaxKind.CommaToken;
                 break;
             case '.':
                 _textCursor.Advance();
-                kind = LexemeKind.DotToken;
+                kind = SyntaxKind.DotToken;
                 if (char.IsDigit(_textCursor.PeekChar()))
                 {
                     while (char.IsDigit(_textCursor.PeekChar()))
                         _textCursor.Advance();
                     
-                    return new InvalidLexeme(
-                        ErrorCode.UnknownCharactersSequence, 
-                        _textCursor.Slice(startingPosition), 
-                        startingPosition
+                    return new BadCharactersSquenceError(
+                        startingPosition,
+                        new string(_textCursor.Slice(startingPosition).Span)
                     );
                 }
                 break;
             case '+':
                 _textCursor.Advance();
-                kind = LexemeKind.PlusToken;
+                kind = SyntaxKind.PlusToken;
                 break;
             case '-':
                 _textCursor.Advance();
-                kind = LexemeKind.MinusToken;
+                kind = SyntaxKind.MinusToken;
                 break;
             case ':':
                 _textCursor.Advance();
-                kind = LexemeKind.ColonToken;
+                kind = SyntaxKind.ColonToken;
                 break;
             case ';':
                 _textCursor.Advance();
-                kind = LexemeKind.SemicolonToken;
+                kind = SyntaxKind.SemicolonToken;
                 break;
             case '*':
                 _textCursor.Advance();
-                kind = LexemeKind.AsteriskToken;
+                kind = SyntaxKind.AsteriskToken;
                 break;
             case '>':
                 _textCursor.Advance();
                 kind = _textCursor.TryAdvance('=')
-                    ? LexemeKind.GreaterThanEqualsToken 
-                    : LexemeKind.GreaterThanToken;
+                    ? SyntaxKind.GreaterThanEqualsToken 
+                    : SyntaxKind.GreaterThanToken;
                 break;
             case '<':
                 _textCursor.Advance();
                 kind = _textCursor.TryAdvance('=')
-                    ? LexemeKind.LessThanEqualsToken 
-                    : LexemeKind.LessThanToken;
+                    ? SyntaxKind.LessThanEqualsToken 
+                    : SyntaxKind.LessThanToken;
                 break;
             case '=':
                 _textCursor.Advance();
                 kind = _textCursor.TryAdvance('=')
-                    ? LexemeKind.EqualsEqualsToken
-                    : LexemeKind.EqualsToken;
+                    ? SyntaxKind.EqualsEqualsToken
+                    : SyntaxKind.EqualsToken;
                 break;
             case '!':
                 _textCursor.Advance();
                 kind = _textCursor.TryAdvance('=')
-                    ? LexemeKind.ExclamationEqualsToken
-                    : LexemeKind.Unknown;
+                    ? SyntaxKind.ExclamationEqualsToken
+                    : SyntaxKind.Unknown;
                 break;
             case '|':
                 _textCursor.Advance();
                 kind = _textCursor.TryAdvance('|')
-                    ? LexemeKind.BarBarToken
-                    : LexemeKind.Unknown;
+                    ? SyntaxKind.BarBarToken
+                    : SyntaxKind.Unknown;
                 break;
             case '&':
                 _textCursor.Advance();
                 kind = _textCursor.TryAdvance('&')
-                    ? LexemeKind.AmpersandAmpersandToken
-                    : LexemeKind.Unknown;
+                    ? SyntaxKind.AmpersandAmpersandToken
+                    : SyntaxKind.Unknown;
                 break;
             case TextCursor.InvalidCharacter:
-                kind = LexemeKind.EndToken;
+                kind = SyntaxKind.EndToken;
                 break;
             
-            case '_':
-            case (>= 'a' and <= 'z') or (>= 'A' and <= 'Z'):
+            case '_' or (>= 'a' and <= 'z') or (>= 'A' and <= 'Z'):
                 return ScanIdentifierOrKeyword();
             case >= '0' and <= '9':
                 return ScanNumericLiteral();
@@ -153,23 +154,20 @@ public class SimpleLexer: ILexer
             default:
                 if (_textCursor.Advance() != 0)
                 {
-                    return new Lexeme(
-                        LexemeKind.Unknown,
-                        _textCursor.Slice(startingPosition),
-                        startingPosition
-                    );
+                    kind = SyntaxKind.Unknown; 
+                    break;
                 }
+                kind = SyntaxKind.EndToken;
                 break;
         };
-        
         return new Lexeme(
             kind,
-            _textCursor.Slice(startingPosition),
+            new string(_textCursor.Slice(startingPosition).Span),
             startingPosition
         );
     }
 
-    private Lexeme ScanNumericLiteral()
+    private ParseResult<Lexeme> ScanNumericLiteral()
     {
         bool isReal = false;
         Location startingPosition = _textCursor.Location;
@@ -182,35 +180,34 @@ public class SimpleLexer: ILexer
             character = _textCursor.NextChar();
         }
 
-        ReadOnlyMemory<char> value = _textCursor.Slice(startingPosition);
+        ReadOnlySpan<char> value = _textCursor.Slice(startingPosition).Span;
 
         if (isReal)
         {
-            if (double.TryParse(value.Span, CultureInfo.InvariantCulture, out double parsed))
+            if (double.TryParse(value, CultureInfo.InvariantCulture, out double parsed))
             {
                 return new Lexeme<double>(
-                    LexemeKind.RealNumberToken,
-                    value,
+                    SyntaxKind.RealNumberToken,
+                    new string(value),
                     startingPosition,
                     parsed
                 );
             }
         }
-        else if (ulong.TryParse(value.Span, out ulong parsed))
+        else if (ulong.TryParse(value, out ulong parsed))
         {
             return new Lexeme<ulong>(
-                LexemeKind.NumberToken,
-                value,
+                SyntaxKind.NumberToken,
+                new string(value),
                 startingPosition,
                 parsed
             );
         }
 
 
-        return new InvalidLexeme(
-            ErrorCode.UnknownCharactersSequence,
-            _textCursor.Slice(startingPosition),
-            startingPosition
+        return new BadCharactersSquenceError(
+            startingPosition,
+            new string(value)
         );
     }
     
@@ -224,14 +221,14 @@ public class SimpleLexer: ILexer
         
         string text = _textCursor.Slice(starting).ToString();
         
-        LexemeKind kind = _keywords.GetValueOrDefault(
+        SyntaxKind kind = _keywords.GetValueOrDefault(
             text,
-            LexemeKind.IdentifierToken
+            SyntaxKind.IdentifierToken
         );
         
         return new Lexeme(
             kind,
-            text.AsMemory(),
+            text,
             starting
         );
     }
@@ -244,7 +241,7 @@ public class SimpleLexer: ILexer
             or (>= '0' and <= '9' or '_');
     }
 
-    private InvalidLexeme? SkipComment()
+    private IncompleteTokenError? SkipComment()
     {
         Location startingPosition = _textCursor.Location;
         char slashCharacter = _textCursor.PeekChar();
@@ -260,10 +257,14 @@ public class SimpleLexer: ILexer
                     if (_textCursor.Advance() != 0)
                         continue;
                     
-                    return new InvalidLexeme(
-                        ErrorCode.IncompleteToken,
-                        _textCursor.Slice(startingPosition, _textCursor.Location),
-                        startingPosition
+                    ReadOnlySpan<char> value = _textCursor.Slice(startingPosition).ToString();
+                    return new IncompleteTokenError(
+                        startingPosition,
+                        badToken: new Lexeme(
+                            SyntaxKind.CommentTrivia,
+                            new string(value),
+                            startingPosition
+                        )
                     );
                 }
                 break;
@@ -284,15 +285,15 @@ public class SimpleLexer: ILexer
 
     }
 
-    private Lexeme ScanStringLiteral()
+    private ParseResult<Lexeme> ScanStringLiteral()
     {
         char quoteCharacter = _textCursor.PeekChar();
         Debug.Assert(quoteCharacter is ('\'' or '\"'));
         
         Location startingPosition = _textCursor.Location;
-        LexemeKind kind = (_textCursor.PeekChar() == '\'')
-            ? LexemeKind.StringLiteral
-            : LexemeKind.CharacterLiteral;
+        SyntaxKind kind = (_textCursor.PeekChar() == '\'')
+            ? SyntaxKind.StringLiteral
+            : SyntaxKind.CharacterLiteral;
 
         StringBuilder builder = new();
         
@@ -308,10 +309,14 @@ public class SimpleLexer: ILexer
             
             if (ch == TextCursor.InvalidCharacter)
             {
-                return new InvalidLexeme(
-                    ErrorCode.IncompleteToken,
-                    _textCursor.Slice(startingPosition),
-                    startingPosition
+                ReadOnlySpan<char> originalValue = _textCursor.Slice(startingPosition).Span;
+                return new IncompleteTokenError(
+                    startingPosition,
+                    badToken: new Lexeme(
+                        SyntaxKind.StringLiteral,
+                        new string(originalValue),
+                        startingPosition
+                    )
                 );
             }
             ch = (ch != '\\')? ch : ScanEscapeSequence();
@@ -320,28 +325,31 @@ public class SimpleLexer: ILexer
         }
         ReadOnlyMemory<char> value = _textCursor.Slice(startingPosition);
         
-        //У символа строго ограниченная длина
         
-        if (kind == LexemeKind.StringLiteral)
+        //У символа строго ограниченная длина
+        if (kind == SyntaxKind.CharacterLiteral)
         {
             if (builder.Length == 1)
                 return new Lexeme<char>(
-                    LexemeKind.CharacterLiteral, 
-                    value, 
+                    SyntaxKind.CharacterLiteral, 
+                    new string(value.Span), 
                     startingPosition, 
                     builder[0]
                 );
             
-            return new InvalidLexeme(
-                ErrorCode.TooManyCharactersInConstant,
-                value,
-                startingPosition
+            return new TooManyCharactersInConstant(
+                startingPosition,
+                badToken: new Lexeme(
+                    SyntaxKind.CharacterLiteral,
+                    new string(value.Span),
+                    startingPosition
+                )
             );
         }
 
         return new Lexeme<string>(
-            LexemeKind.StringLiteral,
-            value,
+            SyntaxKind.StringLiteral,
+            new string(value.Span),
             startingPosition,
             builder.ToString()
         );

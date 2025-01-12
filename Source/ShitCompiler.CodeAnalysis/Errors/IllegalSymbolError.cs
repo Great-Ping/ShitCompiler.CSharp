@@ -1,6 +1,6 @@
-namespace ShitCompiler.Lexicon.Exceptions;
+namespace ShitCompiler.CodeAnalysis.Lexicon.Exceptions;
 
-public class IllegalSymbolException(
+public class IllegalSymbolError(
     string? message = null,
     Exception? innerException = null
 ) : Exception(message, innerException);

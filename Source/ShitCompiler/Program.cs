@@ -1,5 +1,7 @@
 ﻿using System.Xml.Schema;
-using ShitCompiler.Lexicon;
+using ShitCompiler.CodeAnalysis;
+using ShitCompiler.CodeAnalysis.Lexicon;
+using ShitCompiler.CodeAnalysis.Syntax;
 
 namespace ShitCompiler;
 
@@ -36,12 +38,12 @@ class Program
         Console.WriteLine(testInput);
         TextCursor cursor = new(testInput.AsMemory());
         ILexer lexer = new SimpleLexer(cursor);
-        
+
         while (true)
         {
-            Lexeme lexeme = lexer.ScanNext();
-            Console.WriteLine(lexeme);
-            if (lexeme.Kind == LexemeKind.EndToken) 
+            ParseResult<Lexeme> result = lexer.ScanNext();
+            Console.WriteLine(result);
+            if (result.TrySuccess(out var lexeme) && lexeme.Kind == SyntaxKind.EndToken)
                 break;
         }
 

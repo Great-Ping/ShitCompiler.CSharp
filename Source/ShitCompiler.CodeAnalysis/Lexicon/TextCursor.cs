@@ -1,4 +1,4 @@
-namespace ShitCompiler.Lexicon;
+namespace ShitCompiler.CodeAnalysis.Lexicon;
 
 public class TextCursor
 {

@@ -1,5 +1,5 @@
-namespace ShitCompiler.Lexicon;
-public enum LexemeKind
+namespace ShitCompiler.CodeAnalysis.Syntax;
+public enum SyntaxKind
 {
     Unknown,
     /// <summary>
@@ -144,4 +144,9 @@ public enum LexemeKind
     /// ]
     /// </summary>
     CloseBracketToken,
+    
+    /// <summary>
+    /// комментарий
+    /// </summary>
+    CommentTrivia
 }

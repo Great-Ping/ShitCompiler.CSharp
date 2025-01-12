@@ -1,4 +1,4 @@
-namespace ShitCompiler.Lexicon;
+namespace ShitCompiler.CodeAnalysis;
 public record Location(
     int AbsoluteIndex,
     int LineIndex,
