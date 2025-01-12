@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShitCompiler", "Source\Shit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShitCompiler.Lexicon", "Source\ShitCompiler.Lexicon\ShitCompiler.Lexicon.csproj", "{434957B3-8415-4039-88C6-06060651C3F5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShitCompiler.Syntaxis", "Source\ShitCompiler.Syntaxis\ShitCompiler.Syntaxis.csproj", "{36517F10-ACA7-49F4-886E-4239AC4E53DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{434957B3-8415-4039-88C6-06060651C3F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{434957B3-8415-4039-88C6-06060651C3F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{434957B3-8415-4039-88C6-06060651C3F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36517F10-ACA7-49F4-886E-4239AC4E53DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36517F10-ACA7-49F4-886E-4239AC4E53DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36517F10-ACA7-49F4-886E-4239AC4E53DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36517F10-ACA7-49F4-886E-4239AC4E53DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
