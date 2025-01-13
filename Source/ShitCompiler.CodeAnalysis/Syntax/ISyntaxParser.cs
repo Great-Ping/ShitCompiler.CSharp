@@ -4,5 +4,5 @@ namespace ShitCompiler.CodeAnalysis.Syntax;
 
 public interface ISyntaxParser
 {
-    public ParseResult<CompilationUnitSyntax> ParseCompilationUnit();   
+    public CompilationUnitSyntax ParseCompilationUnit();   
 }

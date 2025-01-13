@@ -19,3 +19,17 @@ public record Lexeme<T>(
     Location Start,
     T ParsedValue
 ): Lexeme(Kind, OriginalValue, Start);
+
+public record BadLexeme(
+    LexemeErrorCode ErrorCode,
+    string OriginalValue,
+    Location Start
+): Lexeme(SyntaxKind.BadToken, OriginalValue, Start);
+
+public enum LexemeErrorCode
+{
+    NotSupportedToken,
+    BadCharacterSequence,
+    IncompleteToken,
+    TooManyCharactersInConstant
+}

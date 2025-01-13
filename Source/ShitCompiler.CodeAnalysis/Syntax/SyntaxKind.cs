@@ -1,11 +1,10 @@
 namespace ShitCompiler.CodeAnalysis.Syntax;
 public enum SyntaxKind
 {
-    Unknown,
     /// <summary>
     /// Invalid Token
     /// </summary>
-    InvalidToken,
+    BadToken,
     /// <summary>
     /// End of file
     /// </summary>
