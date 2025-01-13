@@ -43,7 +43,8 @@ class Program
             new LexemeQueue(
                 lexer
             ),
-            new SymbolTable()
+            new SymbolTable(),
+            new UebanErrorsHandlingStrategy()
         );
 
         while (true)

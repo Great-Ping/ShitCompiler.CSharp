@@ -2,7 +2,7 @@ using ShitCompiler.CodeAnalysis.Errors;
 
 namespace ShitCompiler.CodeAnalysis.Syntax.Errors;
 
-public class AnotherTokenExpectedError(
+public class UnexpectedTokenError(
     Location location,
     string? message
 ) : ParseError(location, message);

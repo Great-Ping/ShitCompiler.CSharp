@@ -9,7 +9,7 @@ static partial class ErrorHelper
         SyntaxKind expectedKind, 
         SyntaxKind  receivedKind
     ){
-        return new AnotherTokenExpectedError(
+        return new UnexpectedTokenError(
             location, 
             $"Expected:{expectedKind} Received:{receivedKind}"
         );
