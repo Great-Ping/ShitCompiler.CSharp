@@ -1,4 +1,4 @@
-using ShitCompiler.CodeAnalysis.Syntax.Errors;
+using ShitCompiler.CodeAnalysis.Errors;
 
 namespace ShitCompiler.CodeAnalysis.Lexicon.Errors;
 

@@ -39,9 +39,17 @@ class Program
         TextCursor cursor = new(testInput.AsMemory());
         ILexer lexer = new SimpleLexer(cursor);
 
+        ISyntaxParser parser = new SimpleSyntaxParser(
+            new LexemeQueue(
+                lexer
+            ),
+            new SymbolTable()
+        );
+
         while (true)
         {
             ParseResult<Lexeme> result = lexer.ScanNext();
+            parser.ParseCompilationUnit();
             Console.WriteLine(result);
             if (result.TrySuccess(out var lexeme) && lexeme.Kind == SyntaxKind.EndToken)
                 break;

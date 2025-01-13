@@ -1,4 +1,4 @@
-namespace ShitCompiler.CodeAnalysis.Syntax.Errors;
+namespace ShitCompiler.CodeAnalysis.Errors;
 
 public class ParseError(Location location, string? message)
 {

@@ -1,11 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
-using ShitCompiler.CodeAnalysis.Syntax.Errors;
+using ShitCompiler.CodeAnalysis.Errors;
 using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 namespace ShitCompiler.CodeAnalysis;
 
 public readonly struct ParseResult<TValue>
-    where TValue : ISyntaxNode
 {
     private readonly TValue? _value;
     private readonly ParseError? _error;

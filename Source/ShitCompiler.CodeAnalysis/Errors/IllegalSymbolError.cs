@@ -1,4 +1,4 @@
-namespace ShitCompiler.CodeAnalysis.Lexicon.Exceptions;
+namespace ShitCompiler.CodeAnalysis.Errors;
 
 public class IllegalSymbolError(
     string? message = null,

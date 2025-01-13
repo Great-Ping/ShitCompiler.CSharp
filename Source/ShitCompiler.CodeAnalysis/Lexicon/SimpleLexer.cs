@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
-using ShitCompiler.CodeAnalysis.Errors;
 using ShitCompiler.CodeAnalysis.Lexicon.Errors;
 using ShitCompiler.CodeAnalysis.Syntax;
 
@@ -173,6 +172,7 @@ public class SimpleLexer: ILexer
         Location startingPosition = _textCursor.Location;
         char character = _textCursor.PeekChar();
 
+        
         while (char.IsDigit(character) || character == '.')
         {
             if (character == '.')

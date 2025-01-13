@@ -1,7 +1,4 @@
-using ShitCompiler.CodeAnalysis.Lexicon;
-using ShitCompiler.CodeAnalysis.Lexicon.Errors;
-
-namespace ShitCompiler.CodeAnalysis.Errors;
+namespace ShitCompiler.CodeAnalysis.Lexicon.Errors;
 
 public class IncompleteTokenError(
     Location location, 

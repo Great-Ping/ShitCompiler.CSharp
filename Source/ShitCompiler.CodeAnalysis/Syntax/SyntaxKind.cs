@@ -40,6 +40,14 @@ public enum SyntaxKind
     /// </summary>
     ElseKeyword,
     /// <summary>
+    /// funk
+    /// </summary>
+    FunkKeyword,
+    /// <summary>
+    /// return
+    /// </summary>
+    ReturnKeyword,
+    /// <summary>
     /// var
     /// </summary>
     VarKeyword,
@@ -148,5 +156,7 @@ public enum SyntaxKind
     /// <summary>
     /// комментарий
     /// </summary>
-    CommentTrivia
+    CommentTrivia,
+    CompilationUnitSyntax,
+    Directive
 }

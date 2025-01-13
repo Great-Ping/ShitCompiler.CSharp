@@ -4,10 +4,14 @@ using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 namespace ShitCompiler.CodeAnalysis.Lexicon;
 
 public record Lexeme(
-    SyntaxKind Kind, 
+    SyntaxKind Kind,
     string OriginalValue,
     Location Start
-): ISyntaxNode;
+) : ISyntaxNode
+{
+    public IEnumerable<ISyntaxNode> GetChildren()
+        => Enumerable.Empty<ISyntaxNode>();
+};
 
 public record Lexeme<T>(
     SyntaxKind Kind, 

@@ -1,0 +1,14 @@
+using System.Collections.Immutable;
+using ShitCompiler.CodeAnalysis.Lexicon;
+
+namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
+public record CompilationUnitSyntax(
+    SymbolBlock Block,
+    ImmutableArray<DirectiveSyntax> Directives,
+    Lexeme EndOfFileToken
+) : ISyntaxNode
+{
+    public SyntaxKind Kind => SyntaxKind.CompilationUnitSyntax;
+    public IEnumerable<ISyntaxNode> GetChildren()
+        => Directives;
+};

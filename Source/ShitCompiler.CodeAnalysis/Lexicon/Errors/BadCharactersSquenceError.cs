@@ -1,8 +1,4 @@
-using ShitCompiler.CodeAnalysis.Lexicon;
-using ShitCompiler.CodeAnalysis.Lexicon.Errors;
-using ShitCompiler.CodeAnalysis.Syntax.Errors;
-
-namespace ShitCompiler.CodeAnalysis.Errors;
+namespace ShitCompiler.CodeAnalysis.Lexicon.Errors;
 
 public class BadCharactersSquenceError(
     Location location,
