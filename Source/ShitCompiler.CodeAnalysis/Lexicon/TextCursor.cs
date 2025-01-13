@@ -44,9 +44,8 @@ public class TextCursor
     
     public string SliceString(Location point)
     {
-        return new string(Slice(Location).Span);
+        return new string(Slice(point).Span);
     }
-
     
     /// <summary>
     /// Text[start; end)

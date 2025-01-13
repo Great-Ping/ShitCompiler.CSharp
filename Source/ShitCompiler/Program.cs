@@ -16,7 +16,7 @@ class Program
                            00.00.00
                            132424
                            :
-                           var abs = abstrd;
+                           var abs = "abstrd";
                            
                            ["Строка" 'с' 'Инвалид'] 
                            // Это скипаем () ][
@@ -48,11 +48,11 @@ class Program
 
         while (true)
         {
-            ParseResult<Lexeme> result = lexer.ScanNext();
-            parser.ParseCompilationUnit();
-            Console.WriteLine(result);
-            if (result.TrySuccess(out var lexeme) && lexeme.Kind == SyntaxKind.EndToken)
+            Lexeme result = lexer.ScanNext();
+            if (result.Kind == SyntaxKind.EndToken)
                 break;
+            //parser.ParseCompilationUnit();
+            Console.WriteLine(result);
         }
 
         Console.WriteLine("Hello, World!");
