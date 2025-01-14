@@ -18,12 +18,22 @@ public class LexemeQueue(ILexer lexer)
         return result;
     }
 
-    public Lexeme Current()
+    public Lexeme Peek()
     {
         if (_queue.Count == 0)
             return ScanAndSave();
+        
         return _queue.Last();
     }
+    
+    public Lexeme Peek(int index)
+    {
+        for (int i = index; i >= 0; i--)
+            ScanAndSave();
+
+        return _queue.Last();
+    }
+
     
     public Lexeme Next()
     {
@@ -35,7 +45,7 @@ public class LexemeQueue(ILexer lexer)
         
         return _queue[_currentIndex];
     }
-    
+
     public void Reset(int position)
     {
         _currentIndex = position;

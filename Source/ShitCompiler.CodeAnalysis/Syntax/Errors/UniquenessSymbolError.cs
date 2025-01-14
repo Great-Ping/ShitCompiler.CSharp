@@ -1,5 +1,3 @@
-
-using ShitCompiler.CodeAnalysis.Errors;
 using ShitCompiler.CodeAnalysis.Lexicon;
 
 namespace ShitCompiler.CodeAnalysis.Syntax.Errors;

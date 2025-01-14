@@ -1,24 +1,23 @@
 using ShitCompiler.CodeAnalysis.Lexicon;
-using ShitCompiler.CodeAnalysis.Syntax;
-using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
-using ShitCompiler.CodeAnalysis.Syntax.Errors;
 
-public record IfStatementSyntax(
+namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
+
+public sealed record IfStatementSyntax(
     SymbolBlock SymbolBlock,
     Lexeme IfKeyword,
     ExpressionSyntax Condition,
     StatementSyntax ThenStatement,
     ElseClauseSyntax? ElseClause
-): MemberSyntax(
+): StatementSyntax(
     SymbolBlock,
     SyntaxKind.IfKeyword
 ) {
     public override IEnumerable<ISyntaxNode> GetChildren() {
-        return [
+        return new List<ISyntaxNode?>(){
             IfKeyword,
             Condition,
             ThenStatement,
             ElseClause
-        ];
+        }.Where(x => x is not null)!;
     }
 }

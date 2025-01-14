@@ -1,10 +1,8 @@
 using ShitCompiler.CodeAnalysis.Lexicon;
-using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
-using System.Linq;
-using ShitCompiler.CodeAnalysis.Syntax;
+namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
-public record ParameterSyntax(
+public sealed record ParameterSyntax(
     SymbolBlock SymbolBlock,
     Lexeme Identifier,
     TypeClauseSyntax Type

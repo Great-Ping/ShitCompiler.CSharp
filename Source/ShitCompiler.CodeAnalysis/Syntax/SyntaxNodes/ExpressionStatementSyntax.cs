@@ -1,12 +1,6 @@
-using ShitCompiler.CodeAnalysis.Lexicon;
-using ShitCompiler.CodeAnalysis.Syntax;
-using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
+namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
-using System.Linq;
-using ShitCompiler.CodeAnalysis.Syntax.Errors;
-
-
-public record ExpressionStatementSyntax(
+public sealed record ExpressionStatementSyntax(
     SymbolBlock SymbolBlock,
     ExpressionSyntax Expression
 ): StatementSyntax(

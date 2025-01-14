@@ -9,13 +9,21 @@ public enum SymbolTypes
     ULong    = 0b000100,
     Char    = 0b001000,
     String  = 0b010000, 
-    Function= 0b100000
+    Function= 0b100000,
+    Unknown
 }
 
-public record Symbol(
-    Lexeme Identifier,    
-    SymbolTypes Type
-);
+public record Symbol
+{
+    public Lexeme Identifier { get; set; }
+    public SymbolTypes Type { get; set; }
+
+    public Symbol(Lexeme identifier, SymbolTypes type = SymbolTypes.Unknown)
+    {
+        Identifier = identifier;
+        Type = type;
+    }
+};
 
 public record SymbolBlock(
     SymbolBlock? Parent,

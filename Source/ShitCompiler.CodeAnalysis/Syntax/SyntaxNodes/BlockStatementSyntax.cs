@@ -3,7 +3,7 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
-public record BlockStatementSyntax(
+public sealed record BlockStatementSyntax(
     SymbolBlock SymbolBlock,
     Lexeme OpenBraceToken, 
     ImmutableArray<StatementSyntax> Statements, 

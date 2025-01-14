@@ -54,6 +54,8 @@ public enum SyntaxKind
     /// val
     /// </summary>
     ValKeyword,
+    FalseKeyword,
+    TrueKeyword,
 
     /// <summary>
     /// :
@@ -130,11 +132,11 @@ public enum SyntaxKind
     /// <summary>
     /// (
     /// </summary>
-    OpenParenToken,
+    OpenParenthesisToken,
     /// <summary>
     /// )
     /// </summary>
-    CloseParenToken,
+    CloseParenthesisToken,
     /// <summary>
     /// {
     /// </summary>
@@ -158,5 +160,7 @@ public enum SyntaxKind
     ExpressionStatement,
     FunctionDeclaration,
     BlockStatement,
-    VariableDeclaration
+    VariableDeclaration,
+    TypeClause,
+    AssignmentExpression,
 }

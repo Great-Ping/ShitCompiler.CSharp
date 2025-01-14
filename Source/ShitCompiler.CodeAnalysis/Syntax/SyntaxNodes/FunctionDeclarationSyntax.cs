@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
-public record FunctionDeclarationSyntax(
+public sealed record FunctionDeclarationSyntax(
     SymbolBlock SymbolBlock,
     Lexeme Funk,
     Lexeme Identifier,

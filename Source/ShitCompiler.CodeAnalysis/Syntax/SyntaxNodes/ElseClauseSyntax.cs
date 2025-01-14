@@ -1,14 +1,11 @@
-
-using ShitCompiler.CodeAnalysis.Syntax;
-using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 using ShitCompiler.CodeAnalysis.Lexicon;
 
-using System.Linq;
+namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
-public record ElseClauseSyntax(
+public sealed record ElseClauseSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme elseKeyword,
-    StatementSyntax elseStatement
+    Lexeme ElseKeyword,
+    StatementSyntax ElseStatement
 ): MemberSyntax(
     SymbolBlock,
     SyntaxKind.ElseKeyword
@@ -16,8 +13,8 @@ public record ElseClauseSyntax(
 
     public override IEnumerable<ISyntaxNode> GetChildren() {
         return [
-            elseKeyword,
-            elseStatement
+            ElseKeyword,
+            ElseStatement
         ];
     }
 

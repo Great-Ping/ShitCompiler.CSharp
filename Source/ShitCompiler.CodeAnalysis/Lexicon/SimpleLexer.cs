@@ -44,11 +44,11 @@ public class SimpleLexer: ILexer
                 break;
             case '(':
                 _textCursor.Advance();
-                kind = SyntaxKind.OpenParenToken;
+                kind = SyntaxKind.OpenParenthesisToken;
                 break;
             case ')':
                 _textCursor.Advance();
-                kind = SyntaxKind.CloseParenToken;
+                kind = SyntaxKind.CloseParenthesisToken;
                 break;
             case '{':
                 _textCursor.Advance();

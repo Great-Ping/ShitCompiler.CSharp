@@ -1,5 +1,3 @@
-using ShitCompiler.CodeAnalysis.Errors;
-
 namespace ShitCompiler.CodeAnalysis.Syntax.Errors;
 
 static partial class ErrorHelper
