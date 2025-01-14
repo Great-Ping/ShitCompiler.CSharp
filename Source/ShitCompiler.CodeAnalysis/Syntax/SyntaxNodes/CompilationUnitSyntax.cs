@@ -8,7 +8,7 @@ public sealed record CompilationUnitSyntax(
     Lexeme EndOfFileToken
 ) : ISyntaxNode
 {
-    public SyntaxKind Kind => SyntaxKind.CompilationUnitSyntax;
+    public SyntaxKind Kind => SyntaxKind.CompilationUnit;
     public IEnumerable<ISyntaxNode> GetChildren()
         => Directives;
 };

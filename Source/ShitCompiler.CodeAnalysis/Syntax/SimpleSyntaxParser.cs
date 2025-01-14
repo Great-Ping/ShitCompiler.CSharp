@@ -8,13 +8,14 @@ using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 namespace ShitCompiler.CodeAnalysis.Syntax;
 
 public class SimpleSyntaxParser(
-    LexemeQueue lexemeQueue, 
-    SymbolTable table, 
+    LexemeQueue lexemeQueue,
+    SymbolTable table,
     ISyntaxErrorsHandlingStrategy errorsHandler
-) : ISyntaxParser {
+) : ISyntaxParser
+{
     private readonly LexemeQueue _lexemeQueue = lexemeQueue;
     private readonly SymbolTable _table = table;
-    private readonly ISyntaxErrorsHandlingStrategy _errorsHandler;
+    private readonly ISyntaxErrorsHandlingStrategy _errorsHandler = errorsHandler;
 
     private Lexeme MatchToken(SyntaxKind kind)
     {
@@ -31,6 +32,23 @@ public class SimpleSyntaxParser(
         ));
 
         return new Lexeme(kind, String.Empty, currentToken.Start);
+    }
+
+    private Lexeme MatchToken(Func<SyntaxKind, bool> check, SyntaxKind asDefault)
+    {
+        Lexeme currentToken = _lexemeQueue.Peek();
+        if (check(currentToken.Kind))
+        {
+            _lexemeQueue.Next();
+            return currentToken;
+        }
+
+        _errorsHandler.Handle(new UnexpectedTokenError(
+            currentToken.Start,
+            $"Waited: {asDefault} Returned: {currentToken.Kind}"
+        ));
+
+        return new Lexeme(asDefault, String.Empty, currentToken.Start);
     }
     
     public CompilationUnitSyntax ParseCompilationUnit()
@@ -49,7 +67,7 @@ public class SimpleSyntaxParser(
         while (currentToken.Kind != SyntaxKind.EndToken)
         {
             MemberSyntax member = ParseMember();
-            
+
             members.Add(member);
 
             if (currentToken == _lexemeQueue.Peek())
@@ -57,7 +75,7 @@ public class SimpleSyntaxParser(
 
             currentToken = _lexemeQueue.Peek();
         }
-        
+
         return members.ToImmutable();
     }
 
@@ -77,22 +95,22 @@ public class SimpleSyntaxParser(
         var funkDeclarationBlock = _table.Current;
 
         ///Проверкаа уникальности идентификатора
-        funkDeclarationBlock.FindInBlock(identifier);
-        if (funkDeclarationBlock != null)
+        var symbol = funkDeclarationBlock.FindInBlock(identifier);
+        if (symbol != null)
             _errorsHandler.Handle(new UniquenessSymbolError(identifier));
-        
-        _table.AddSymbol(new Symbol(identifier,  SymbolTypes.Function | SymbolTypes.Void));
+
+        _table.AddSymbol(new Symbol(identifier, SymbolTypes.Function | SymbolTypes.Void));
         SymbolBlock funkBlock = _table.CreateNewSymbolBlock();
-        
+
 
         var function = new FunctionDeclarationSyntax(
             funkDeclarationBlock,
             funk,
             identifier,
-            MatchToken(SyntaxKind.OpenBraceToken),
+            MatchToken(SyntaxKind.OpenParenthesisToken),
             ParseParameterList(),
-            MatchToken(SyntaxKind.CloseBraceToken),
-            ParseOptionalTypeClause(),
+            MatchToken(SyntaxKind.CloseParenthesisToken),
+            ParseTypeClause(),
             ParseBlockStatement(funkBlock)
         );
 
@@ -101,21 +119,26 @@ public class SimpleSyntaxParser(
         return function;
     }
 
-    private SeparatedSyntaxList<ParameterSyntax> ParseParameterList() {
+    private SeparatedSyntaxList<ParameterSyntax> ParseParameterList()
+    {
         var nodesAndSeparators = ImmutableArray.CreateBuilder<SyntaxNode>();
         var parseNextParameter = true;
         while (
             parseNextParameter &&
             _lexemeQueue.Peek().Kind != SyntaxKind.CloseParenthesisToken &&
             _lexemeQueue.Peek().Kind != SyntaxKind.EndToken
-        ) {
+        )
+        {
             var parameter = ParseParameter();
             nodesAndSeparators.Add(parameter);
 
-            if (_lexemeQueue.Peek().Kind == SyntaxKind.CommaToken) {
+            if (_lexemeQueue.Peek().Kind == SyntaxKind.CommaToken)
+            {
                 var comma = MatchToken(SyntaxKind.CommaToken);
                 nodesAndSeparators.Add(comma);
-            } else {
+            }
+            else
+            {
                 parseNextParameter = false;
             }
         }
@@ -125,7 +148,8 @@ public class SimpleSyntaxParser(
         );
     }
 
-    private ParameterSyntax ParseParameter() {
+    private ParameterSyntax ParseParameter()
+    {
         var id = MatchToken(SyntaxKind.IdentifierToken);
         _table.AddSymbol(new Symbol(id));
         var type = ParseTypeClause();
@@ -144,19 +168,22 @@ public class SimpleSyntaxParser(
         );
     }
 
-    private StatementSyntax ParseStatement(SymbolBlock? blockForBlockStatement = null) {
+    private StatementSyntax ParseStatement(SymbolBlock? blockForBlockStatement = null)
+    {
         switch (_lexemeQueue.Peek().Kind)
         {
             case SyntaxKind.OpenBraceToken:
-                if (blockForBlockStatement == null){
-                    BlockStatementSyntax blockStatement =  ParseBlockStatement(
+                if (blockForBlockStatement == null)
+                {
+                    BlockStatementSyntax blockStatement = ParseBlockStatement(
                         _table.CreateNewSymbolBlock()
                     );
                     _table.DismissBlock();
                     return blockStatement;
                 }
+
                 return ParseBlockStatement(blockForBlockStatement);
-                
+
             case SyntaxKind.ValKeyword:
             case SyntaxKind.VarKeyword:
                 return ParseVariableDeclaration();
@@ -171,14 +198,18 @@ public class SimpleSyntaxParser(
 
     private StatementSyntax ParseExpressionStatement()
     {
+        var expression = ParseExpression();
+        var semicolon = MatchToken(SyntaxKind.SemicolonToken);
         return new ExpressionStatementSyntax(
             _table.Current,
-            ParseExpression()
+            expression,
+            semicolon
         );
     }
 
-    private BlockStatementSyntax ParseBlockStatement(SymbolBlock block) {
-       
+    private BlockStatementSyntax ParseBlockStatement(SymbolBlock block)
+    {
+
         var statements = ImmutableArray.CreateBuilder<StatementSyntax>();
 
         var openBraceToken = MatchToken(SyntaxKind.OpenBraceToken);
@@ -187,7 +218,8 @@ public class SimpleSyntaxParser(
         while (
             startToken.Kind != SyntaxKind.EndToken &&
             startToken.Kind != SyntaxKind.CloseBraceToken
-        ){
+        )
+        {
 
             var statement = ParseStatement();
 
@@ -195,23 +227,30 @@ public class SimpleSyntaxParser(
 
             if (startToken == _lexemeQueue.Peek())
                 _lexemeQueue.Next();
-            
+
             startToken = _lexemeQueue.Peek();
         }
 
         var closeBraceToken = MatchToken(SyntaxKind.CloseBraceToken);
-        return new BlockStatementSyntax(block, openBraceToken, statements.ToImmutable(), closeBraceToken);    
+        return new BlockStatementSyntax(block, openBraceToken, statements.ToImmutable(), closeBraceToken);
 
     }
 
-    private StatementSyntax ParseVariableDeclaration() {
-        var expected = _lexemeQueue.Peek().Kind == SyntaxKind.ValKeyword ?
-            SyntaxKind.ValKeyword : SyntaxKind.VarKeyword;
+    private StatementSyntax ParseVariableDeclaration()
+    {
+        var expected = _lexemeQueue.Peek().Kind == SyntaxKind.ValKeyword
+            ? SyntaxKind.ValKeyword
+            : SyntaxKind.VarKeyword;
+        
         var keyword = MatchToken(expected);
+
         var identifier = MatchToken(SyntaxKind.IdentifierToken);
-        var typeClause = ParseOptionalTypeClause();
+        _table.AddSymbol(new(identifier));
+        
+        var typeClause = ParseTypeClause();
         var equals = MatchToken(SyntaxKind.EqualsToken);
         var initializer = ParseExpression();
+        var semicolon = MatchToken(SyntaxKind.SemicolonToken);
 
         return new VariableDeclarationSyntax(
             _table.Current,
@@ -219,27 +258,40 @@ public class SimpleSyntaxParser(
             identifier,
             typeClause,
             equals,
-            initializer
+            initializer,
+            semicolon
         );
     }
 
-    private TypeClauseSyntax? ParseOptionalTypeClause() {
-        if (_lexemeQueue.Peek().Kind != SyntaxKind.ColonToken) {
-            return null;
-        }
-        
-        return ParseTypeClause();
-    }
 
-    private TypeClauseSyntax ParseTypeClause() {
+    //TODO
+    //Добавить ебаный семантический анализ
+    //и проверку на массив
+    private TypeClauseSyntax ParseTypeClause()
+    {
         var coloToke = MatchToken(SyntaxKind.ColonToken);
-        var identifier = MatchToken(SyntaxKind.IdentifierToken);
-        
+      
         return new TypeClauseSyntax(
             _table.Current,
             coloToke,
-            identifier
+            ParseType()
         );
+    }
+
+    private TypeSyntax ParseType()
+    {
+        var type = MatchToken((kind) => kind.IsType(), SyntaxKind.Type);
+
+        if (_lexemeQueue.Peek(1).Kind == SyntaxKind.OpenBracketToken)
+        {
+            var openBracket = MatchToken(SyntaxKind.OpenBracketToken);
+            var number = (MatchToken(SyntaxKind.NumberToken) as Lexeme<long>)!;
+            var closeBracket = MatchToken(SyntaxKind.CloseBracketToken);
+            return new ArrayTypeSyntax(_table.Current, type, openBracket, number, closeBracket);
+        }
+        
+        return new IdentifierTypeSyntax(_table.Current, type);
+
     }
 
     private IfStatementSyntax ParseIfStatement() {
@@ -273,8 +325,20 @@ public class SimpleSyntaxParser(
     }
 
     private StatementSyntax ParseReturnStatement() {
-        throw new NotImplementedException();
+        var keyword = MatchToken(SyntaxKind.ReturnKeyword);
+        ExpressionSyntax? expression = null;
+        
+        if (_lexemeQueue.Peek().Kind != SyntaxKind.SemicolonToken)
+            expression = ParseExpression();
+        
+        var semicolon = MatchToken(SyntaxKind.SemicolonToken);
 
+        return new ReturnStatementSyntax(
+            _table.Current, 
+            keyword, 
+            expression, 
+            semicolon
+        );
     }
     
     private ExpressionSyntax ParseExpression()
@@ -301,9 +365,9 @@ public class SimpleSyntaxParser(
         var unaryOperatorPrecedence = _lexemeQueue.Peek().Kind.GetUnaryOperatorPrecedence();
         if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
         {
-            var operatorToken = NextToken();
+            var operatorToken = _lexemeQueue.Next();
             var operand = ParseBinaryExpression(unaryOperatorPrecedence);
-            left = new UnaryExpressionSyntax(_syntaxTree, operatorToken, operand);
+            left = new UnaryExpressionSyntax(_table.Current, operatorToken, operand);
         }
         else
         {
@@ -312,13 +376,13 @@ public class SimpleSyntaxParser(
 
         while (true)
         {
-            var precedence = Current.Kind.GetBinaryOperatorPrecedence();
+            var precedence = _lexemeQueue.Peek().Kind.GetBinaryOperatorPrecedence();
             if (precedence == 0 || precedence <= parentPrecedence)
                 break;
 
-            var operatorToken = NextToken();
+            var operatorToken = _lexemeQueue.Next();
             var right = ParseBinaryExpression(precedence);
-            left = new BinaryExpressionSyntax(_syntaxTree, left, operatorToken, right);
+            left = new BinaryExpressionSyntax(_table.Current, left, operatorToken, right);
         }
 
         return left;
@@ -326,7 +390,7 @@ public class SimpleSyntaxParser(
 
     private ExpressionSyntax ParsePrimaryExpression()
     {
-        switch (Current.Kind)
+        switch (_lexemeQueue.Peek().Kind)
         {
             case SyntaxKind.OpenParenthesisToken:
                 return ParseParenthesizedExpression();
@@ -337,47 +401,64 @@ public class SimpleSyntaxParser(
 
             case SyntaxKind.NumberToken:
                 return ParseNumberLiteral();
-
+            case SyntaxKind.RealNumberToken:
+                return ParseRealNumberLiteral();
+            
             case SyntaxKind.StringToken:
                 return ParseStringLiteral();
-
+            case SyntaxKind.CharacterToken:
+                return ParseCharLiteral();
+            
             case SyntaxKind.IdentifierToken:
             default:
                 return ParseNameOrCallExpression();
         }
     }
 
+
     private ExpressionSyntax ParseParenthesizedExpression()
     {
         var left = MatchToken(SyntaxKind.OpenParenthesisToken);
         var expression = ParseExpression();
         var right = MatchToken(SyntaxKind.CloseParenthesisToken);
-        return new ParenthesizedExpressionSyntax(_syntaxTree, left, expression, right);
+        return new ParenthesizedExpressionSyntax(_table.Current, left, expression, right);
     }
 
     private ExpressionSyntax ParseBooleanLiteral()
     {
-        var isTrue = Current.Kind == SyntaxKind.TrueKeyword;
+        var isTrue = _lexemeQueue.Peek().Kind == SyntaxKind.TrueKeyword;
         var keywordToken = isTrue ? MatchToken(SyntaxKind.TrueKeyword) : MatchToken(SyntaxKind.FalseKeyword);
-        return new LiteralExpressionSyntax(_syntaxTree, keywordToken, isTrue);
+        return new LiteralExpressionSyntax<bool>(_table.Current, keywordToken, isTrue);
+    }
+    private ExpressionSyntax ParseRealNumberLiteral()
+    {
+        var numberToken = (MatchToken(SyntaxKind.NumberToken) as Lexeme<long>)!;
+        return new LiteralExpressionSyntax<double>(_table.Current, numberToken, numberToken.ParsedValue);
     }
 
     private ExpressionSyntax ParseNumberLiteral()
     {
-        var numberToken = MatchToken(SyntaxKind.NumberToken);
-        return new LiteralExpressionSyntax(_syntaxTree, numberToken);
+        var numberToken = (MatchToken(SyntaxKind.NumberToken) as Lexeme<long>)!;
+        return new LiteralExpressionSyntax<long>(_table.Current, numberToken, numberToken.ParsedValue);
     }
 
     private ExpressionSyntax ParseStringLiteral()
     {
-        var stringToken = MatchToken(SyntaxKind.StringToken);
-        return new LiteralExpressionSyntax(_syntaxTree, stringToken);
+        var stringToken = (MatchToken(SyntaxKind.StringToken) as Lexeme<string>)!;
+        return new LiteralExpressionSyntax<string>(_table.Current, stringToken, stringToken.ParsedValue);
+    }
+
+    private ExpressionSyntax ParseCharLiteral()
+    {
+        var stringToken = (MatchToken(SyntaxKind.CharacterToken) as Lexeme<char>)!;
+        return new LiteralExpressionSyntax<char>(_table.Current, stringToken, stringToken.ParsedValue);
     }
 
     private ExpressionSyntax ParseNameOrCallExpression()
     {
-        if (Peek(0).Kind == SyntaxKind.IdentifierToken && Peek(1).Kind == SyntaxKind.OpenParenthesisToken)
-            return ParseCallExpression();
+        if (_lexemeQueue.Peek().Kind == SyntaxKind.IdentifierToken
+            && _lexemeQueue.Peek(1).Kind == SyntaxKind.OpenParenthesisToken
+        ) return ParseCallExpression();
 
         return ParseNameExpression();
     }
@@ -388,7 +469,7 @@ public class SimpleSyntaxParser(
         var openParenthesisToken = MatchToken(SyntaxKind.OpenParenthesisToken);
         var arguments = ParseArguments();
         var closeParenthesisToken = MatchToken(SyntaxKind.CloseParenthesisToken);
-        return new CallExpressionSyntax(_syntaxTree, identifier, openParenthesisToken, arguments, closeParenthesisToken);
+        return new CallExpressionSyntax(_table.Current, identifier, openParenthesisToken, arguments, closeParenthesisToken);
     }
 
     private SeparatedSyntaxList<ExpressionSyntax> ParseArguments()
@@ -397,13 +478,13 @@ public class SimpleSyntaxParser(
 
         var parseNextArgument = true;
         while (parseNextArgument &&
-               Current.Kind != SyntaxKind.CloseParenthesisToken &&
-               Current.Kind != SyntaxKind.EndOfFileToken)
+               _lexemeQueue.Peek().Kind != SyntaxKind.CloseParenthesisToken &&
+               _lexemeQueue.Peek().Kind != SyntaxKind.EndToken)
         {
             var expression = ParseExpression();
             nodesAndSeparators.Add(expression);
 
-            if (Current.Kind == SyntaxKind.CommaToken)
+            if (_lexemeQueue.Peek().Kind == SyntaxKind.CommaToken)
             {
                 var comma = MatchToken(SyntaxKind.CommaToken);
                 nodesAndSeparators.Add(comma);
@@ -414,13 +495,14 @@ public class SimpleSyntaxParser(
             }
         }
 
-        return new SeparatedSyntaxList<ExpressionSyntax>(nodesAndSeparators.ToImmutable());
+        return new SeparatedSyntaxList<ExpressionSyntax>(
+            nodesAndSeparators.ToImmutable()
+        );
     }
 
     private ExpressionSyntax ParseNameExpression()
     {
         var identifierToken = MatchToken(SyntaxKind.IdentifierToken);
-        return new NameExpressionSyntax(_syntaxTree, identifierToken);
+        return new NameExpressionSyntax(_table.Current, identifierToken);
     }
 }
-

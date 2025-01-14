@@ -14,10 +14,6 @@ public enum SyntaxKind
     /// </summary>
     IdentifierToken,
     /// <summary>
-    /// Some string
-    /// </summary>
-    StringLiteral,
-    /// <summary>
     /// Some Number 12312
     /// </summary>
     NumberToken,
@@ -28,7 +24,8 @@ public enum SyntaxKind
     /// <summary>
     /// Some Character
     /// </summary>
-    CharacterLiteral,
+    CharacterToken,
+    StringToken,
 
     /// <summary>
     /// if
@@ -90,7 +87,7 @@ public enum SyntaxKind
     /// <summary>
     /// *
     /// </summary>
-    AsteriskToken,
+    StarToken,
     /// <summary>
     /// /
     /// </summary>
@@ -153,14 +150,33 @@ public enum SyntaxKind
     /// ]
     /// </summary>
     CloseBracketToken,
+    
     CommentTrivia,
-    CompilationUnitSyntax,
-    Directive,
+    
+    CompilationUnit,
     GlobalStatement,
     ExpressionStatement,
-    FunctionDeclaration,
+    ReturnStatement,
     BlockStatement,
+    
+    FunctionDeclaration,
     VariableDeclaration,
     TypeClause,
     AssignmentExpression,
+    ParenthesizedExpression,
+    LiteralExpression,
+    CallExpression,
+    NameExpression,
+    UnaryExpression,
+    BinaryExpression,
+    
+    IdentifierTypeSyntax,
+    ArrayTypeSyntax,
+    
+    StringType,
+    LongType,
+    CharacterType,
+    BooleanType,
+    Type,
+    DoubleType
 }

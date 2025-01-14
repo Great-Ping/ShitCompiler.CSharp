@@ -8,13 +8,6 @@ namespace ShitCompiler.CodeAnalysis.Lexicon;
 public class SimpleLexer: ILexer
 {
     private TextCursor _textCursor;
-    private Dictionary<string, SyntaxKind> _keywords = new(){
-        { "if" ,  SyntaxKind.IfKeyword },
-        { "else" ,  SyntaxKind.ElseKeyword },
-        { "var", SyntaxKind.VarKeyword },
-        { "val" ,  SyntaxKind.ValKeyword },
-    };
-    
     
     public SimpleLexer(TextCursor textCursor)
     {
@@ -103,7 +96,7 @@ public class SimpleLexer: ILexer
                 break;
             case '*':
                 _textCursor.Advance();
-                kind = SyntaxKind.AsteriskToken;
+                kind = SyntaxKind.StarToken;
                 break;
             case '>':
                 _textCursor.Advance();
@@ -159,9 +152,14 @@ public class SimpleLexer: ILexer
                 kind = SyntaxKind.EndToken;
                 break;
         };
+
+        string originalValue = (kind == SyntaxKind.BadToken)
+            ? _textCursor.SliceString(startingPosition)
+            : SyntaxFacts.GetText(kind);
+
         return new Lexeme(
             kind,
-            new string(_textCursor.Slice(startingPosition).Span),
+            originalValue,
             startingPosition
         );
     }
@@ -196,11 +194,11 @@ public class SimpleLexer: ILexer
         }
         else if (ulong.TryParse(originalValue, out ulong parsed))
         {
-            return new Lexeme<ulong>(
+            return new Lexeme<long>(
                 SyntaxKind.NumberToken,
                 originalValue,
                 startingPosition,
-                parsed
+                (long)parsed
             );
         }
 
@@ -221,10 +219,9 @@ public class SimpleLexer: ILexer
             character = _textCursor.NextChar();   
         
         string text = _textCursor.Slice(starting).ToString();
-        
-        SyntaxKind kind = _keywords.GetValueOrDefault(
-            text,
-            SyntaxKind.IdentifierToken
+
+        SyntaxKind kind = SyntaxFacts.GetKeywordKind(
+            text
         );
         
         return new Lexeme(
@@ -289,8 +286,8 @@ public class SimpleLexer: ILexer
         
         Location startingPosition = _textCursor.Location;
         SyntaxKind kind = (_textCursor.PeekChar() == '\'')
-            ? SyntaxKind.StringLiteral
-            : SyntaxKind.CharacterLiteral;
+            ? SyntaxKind.CharacterToken
+            : SyntaxKind.StringToken;
 
         StringBuilder builder = new();
         
@@ -319,11 +316,11 @@ public class SimpleLexer: ILexer
         string originalValue = _textCursor.SliceString(startingPosition);
         
         //У символа строго ограниченная длина
-        if (kind == SyntaxKind.CharacterLiteral)
+        if (kind == SyntaxKind.CharacterToken)
         {
             if (builder.Length == 1)
                 return new Lexeme<char>(
-                    SyntaxKind.CharacterLiteral, 
+                    SyntaxKind.CharacterToken, 
                     originalValue, 
                     startingPosition, 
                     builder[0]
@@ -337,7 +334,7 @@ public class SimpleLexer: ILexer
         }
 
         return new Lexeme<string>(
-            SyntaxKind.StringLiteral,
+            SyntaxKind.StringToken,
             originalValue,
             startingPosition,
             builder.ToString()

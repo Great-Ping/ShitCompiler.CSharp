@@ -11,7 +11,7 @@ public sealed record FunctionDeclarationSyntax(
     Lexeme OpenParenthesisToken,
     SeparatedSyntaxList<ParameterSyntax> Parameters,
     Lexeme CloseParenthesisToken,
-    TypeClauseSyntax? Type,
+    TypeClauseSyntax Type,
     BlockStatementSyntax Block
 ): MemberSyntax(SymbolBlock, SyntaxKind.FunctionDeclaration) {
 
@@ -27,7 +27,7 @@ public sealed record FunctionDeclarationSyntax(
                 CloseParenthesisToken,
                 Type,
                 Block
-            ]).Where(n => n is not null)!;
+            ]);
     }
 
 };

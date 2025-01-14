@@ -17,31 +17,22 @@ public class LexemeQueue(ILexer lexer)
         _queue.Add(result);
         return result;
     }
-
-    public Lexeme Peek()
-    {
-        if (_queue.Count == 0)
-            return ScanAndSave();
-        
-        return _queue.Last();
-    }
     
-    public Lexeme Peek(int index)
+    public Lexeme Peek(int index = 0)
     {
-        for (int i = index; i >= 0; i--)
+        for (int i = _currentIndex + index; i >= _queue.Count; i--)
             ScanAndSave();
 
-        return _queue.Last();
+        return _queue[_currentIndex + index];
     }
 
     
     public Lexeme Next()
     {
+        _currentIndex++;
+
         if (_currentIndex >= _queue.Count)
-        {
-            _currentIndex++;
             return ScanAndSave();
-        }
         
         return _queue[_currentIndex];
     }

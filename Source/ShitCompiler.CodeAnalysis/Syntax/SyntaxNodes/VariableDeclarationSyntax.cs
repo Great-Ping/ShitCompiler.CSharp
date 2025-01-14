@@ -8,7 +8,8 @@ public sealed record VariableDeclarationSyntax(
     Lexeme Identifier,
     TypeClauseSyntax? TypeClause,
     Lexeme EqualsToken,
-    ExpressionSyntax Initializer
+    ExpressionSyntax Initializer,
+    Lexeme SemicolonToken
 ): StatementSyntax(
     SymbolBlock,
     SyntaxKind.VariableDeclaration

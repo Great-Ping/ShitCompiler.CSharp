@@ -1,8 +1,11 @@
+using ShitCompiler.CodeAnalysis.Lexicon;
+
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record ExpressionStatementSyntax(
     SymbolBlock SymbolBlock,
-    ExpressionSyntax Expression
+    ExpressionSyntax Expression,
+    Lexeme semicolon
 ): StatementSyntax(
     SymbolBlock,
     SyntaxKind.ExpressionStatement

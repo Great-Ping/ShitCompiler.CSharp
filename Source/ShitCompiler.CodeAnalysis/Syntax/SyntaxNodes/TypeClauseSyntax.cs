@@ -2,18 +2,37 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 using ShitCompiler.CodeAnalysis.Lexicon;
 using ShitCompiler.CodeAnalysis.Syntax;
-using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
+
+public sealed record IdentifierTypeSyntax(
+    SymbolBlock SymbolBlock,
+    Lexeme Identifier
+) : TypeSyntax(SymbolBlock, SyntaxKind.IdentifierTypeSyntax);
+
+
+public sealed record ArrayTypeSyntax(
+    SymbolBlock SymbolBlock,
+    Lexeme Identifier,
+    Lexeme OpenBracket,
+    Lexeme<long> ArraySizeNumber,
+    Lexeme CloseBracket
+) : TypeSyntax(SymbolBlock, SyntaxKind.ArrayTypeSyntax);
+
+public abstract record TypeSyntax(
+    SymbolBlock SymbolBlock,
+    SyntaxKind Kind
+) : SyntaxNode(Kind);
+
 
 public sealed record TypeClauseSyntax(
     SymbolBlock SymbolBlock,
     Lexeme ColonToken,
-    Lexeme Identifier
+    TypeSyntax Type
 ) : SyntaxNode(SyntaxKind.TypeClause) {
 
     public override IEnumerable<ISyntaxNode> GetChildren() {
         return [
             ColonToken,
-            Identifier
+            Type
         ];
     }
 
