@@ -151,11 +151,12 @@ public enum SyntaxKind
     /// ]
     /// </summary>
     CloseBracketToken,
-    
-    /// <summary>
-    /// комментарий
-    /// </summary>
     CommentTrivia,
     CompilationUnitSyntax,
-    Directive
+    Directive,
+    GlobalStatement,
+    ExpressionStatement,
+    FunctionDeclaration,
+    BlockStatement,
+    VariableDeclaration
 }

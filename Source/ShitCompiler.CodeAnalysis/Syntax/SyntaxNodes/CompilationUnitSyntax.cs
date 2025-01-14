@@ -4,7 +4,7 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 public record CompilationUnitSyntax(
     SymbolBlock Block,
-    ImmutableArray<DirectiveSyntax> Directives,
+    ImmutableArray<MemberSyntax> Directives,
     Lexeme EndOfFileToken
 ) : ISyntaxNode
 {

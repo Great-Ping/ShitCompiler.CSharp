@@ -8,7 +8,7 @@ public class LexemeQueue(ILexer lexer)
     private int _currentIndex = 0;
     private readonly List<Lexeme> _queue = new();
     private readonly ILexer _lexer = lexer;
-    public int Position { get; set; }
+    public int CurrentIndex => _currentIndex;
 
 
     private Lexeme ScanAndSave()
@@ -18,7 +18,7 @@ public class LexemeQueue(ILexer lexer)
         return result;
     }
 
-    public Lexeme Last()
+    public Lexeme Current()
     {
         if (_queue.Count == 0)
             return ScanAndSave();

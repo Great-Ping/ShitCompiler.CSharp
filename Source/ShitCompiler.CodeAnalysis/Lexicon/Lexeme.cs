@@ -7,11 +7,7 @@ public record Lexeme(
     SyntaxKind Kind,
     string OriginalValue,
     Location Start
-) : ISyntaxNode
-{
-    public IEnumerable<ISyntaxNode> GetChildren()
-        => Enumerable.Empty<ISyntaxNode>();
-};
+) : SyntaxNode(Kind);
 
 public record Lexeme<T>(
     SyntaxKind Kind, 

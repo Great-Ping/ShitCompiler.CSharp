@@ -19,19 +19,50 @@ public record Symbol(
 
 public record SymbolBlock(
     SymbolBlock? Parent,
-    IDictionary<string, Symbol> Lexemes
+    IDictionary<string, Symbol> Symbols
 )
 {
+
+    public Symbol? Find(Lexeme identifier)
+    {
+        return Find(identifier.OriginalValue, identifier.Start);
+    }
+
+    public Symbol? FindInBlock(Lexeme identifier)
+    {
+        return FindInBlock(identifier.OriginalValue, identifier.Start);
+    }
+
     public Symbol? Find(string identifier, Location location)
     {
-        if (!Lexemes.TryGetValue(identifier, out Symbol? value))
+        if (!Symbols.TryGetValue(identifier, out Symbol? value))
             return Parent?.Find(identifier, location);
 
         if (value.Identifier.Start.AbsoluteIndex > location.AbsoluteIndex)
             return Parent?.Find(identifier, location);
 
         return value;
-    } 
+    }
+
+    public Symbol? FindInBlock(string identifier, Location location)
+    {
+        if (!Symbols.TryGetValue(identifier, out Symbol? value))
+            return null;
+        
+        if (value.Identifier.Start.AbsoluteIndex > location.AbsoluteIndex)
+            return null;
+
+        return value;
+    }
+
+    public void AddSymbol(Symbol symbol)
+    {
+        Symbols.Add(symbol.Identifier.OriginalValue, symbol);
+    }
+
+    public SymbolBlock CreateChild(){
+        return new SymbolBlock(this, new Dictionary<string, Symbol>());
+    }
 };
 
 public class SymbolTable
@@ -50,9 +81,23 @@ public class SymbolTable
         return _current.Find(identifier, location);
     }
 
-    public void CreateNewSymbolBlock()
+    public Symbol? Find(Lexeme lexeme)
     {
-        _current = new SymbolBlock(_current, new Dictionary<string, Symbol>());
+        if (lexeme.Kind != SyntaxKind.IdentifierToken)
+            return null;
+
+        return _current.Find(lexeme.OriginalValue, lexeme.Start);
+    }
+
+    public void AddSymbol(Symbol symbol)
+    {
+        _current.Symbols.Add(symbol.Identifier.OriginalValue, symbol);
+    }
+
+    public SymbolBlock CreateNewSymbolBlock()
+    {
+        _current = _current.CreateChild();
+        return _current;
     }
 
     public void DismissBlock()
