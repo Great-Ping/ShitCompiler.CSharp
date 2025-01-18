@@ -4,6 +4,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShitCompiler", "Source\Shit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShitCompiler.CodeAnalysis", "Source\ShitCompiler.CodeAnalysis\ShitCompiler.CodeAnalysis.csproj", "{E5DB8A84-F217-46B5-9845-986527276993}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ui", "Ui", "{CA4DB819-A594-4ADD-8B37-0B2AA3A2E360}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShitCompiler.Common", "Source\Ui\ShitCompiler.Ui\ShitCompiler.Common\ShitCompiler.Common.csproj", "{A8E69852-7F7B-4CE2-A4A1-D6B67080DA11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShitCompiler.Android", "Source\Ui\ShitCompiler.Ui\ShitCompiler.Android\ShitCompiler.Android.csproj", "{AA1F1153-096C-4BCE-A8A8-D0C1E9DBB4F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShitCompiler.Desktop", "Source\Ui\ShitCompiler.Ui\ShitCompiler.Desktop\ShitCompiler.Desktop.csproj", "{C8E57FBC-8EB5-40D8-B754-59F1832E3E5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShitCompiler.Browser", "Source\Ui\ShitCompiler.Ui\ShitCompiler.Browser\ShitCompiler.Browser.csproj", "{D988C19F-632E-4E35-B3FF-437123768B7F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +28,27 @@ Global
 		{E5DB8A84-F217-46B5-9845-986527276993}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5DB8A84-F217-46B5-9845-986527276993}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5DB8A84-F217-46B5-9845-986527276993}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8E69852-7F7B-4CE2-A4A1-D6B67080DA11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8E69852-7F7B-4CE2-A4A1-D6B67080DA11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8E69852-7F7B-4CE2-A4A1-D6B67080DA11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8E69852-7F7B-4CE2-A4A1-D6B67080DA11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA1F1153-096C-4BCE-A8A8-D0C1E9DBB4F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA1F1153-096C-4BCE-A8A8-D0C1E9DBB4F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA1F1153-096C-4BCE-A8A8-D0C1E9DBB4F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA1F1153-096C-4BCE-A8A8-D0C1E9DBB4F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8E57FBC-8EB5-40D8-B754-59F1832E3E5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8E57FBC-8EB5-40D8-B754-59F1832E3E5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8E57FBC-8EB5-40D8-B754-59F1832E3E5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8E57FBC-8EB5-40D8-B754-59F1832E3E5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D988C19F-632E-4E35-B3FF-437123768B7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D988C19F-632E-4E35-B3FF-437123768B7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D988C19F-632E-4E35-B3FF-437123768B7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D988C19F-632E-4E35-B3FF-437123768B7F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A8E69852-7F7B-4CE2-A4A1-D6B67080DA11} = {CA4DB819-A594-4ADD-8B37-0B2AA3A2E360}
+		{AA1F1153-096C-4BCE-A8A8-D0C1E9DBB4F1} = {CA4DB819-A594-4ADD-8B37-0B2AA3A2E360}
+		{C8E57FBC-8EB5-40D8-B754-59F1832E3E5A} = {CA4DB819-A594-4ADD-8B37-0B2AA3A2E360}
+		{D988C19F-632E-4E35-B3FF-437123768B7F} = {CA4DB819-A594-4ADD-8B37-0B2AA3A2E360}
 	EndGlobalSection
 EndGlobal

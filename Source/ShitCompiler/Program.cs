@@ -13,13 +13,22 @@ class Program
         string testInput = 
         """
            funk abc(abc1:long, avs2:double): long
-           {
+           {     
+                return 1+1+2+3+4+avs2;
                 return abc1;
            }
            
            abc();
            
-           val sd:string="12312";                               
+           val sd:string="12312" + 123 + 5 + 3 +3 + 5+ 6+ 4 + 4;      
+           
+           if(12334 != (2345 + 0))
+                sd = "abc";
+        
+            else 
+                sd = "abc2";
+            
+
         """;
         Console.WriteLine(testInput);
         TextCursor cursor = new(testInput.AsMemory());

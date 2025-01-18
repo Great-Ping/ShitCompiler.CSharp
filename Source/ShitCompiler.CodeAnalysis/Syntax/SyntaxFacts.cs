@@ -28,6 +28,7 @@ namespace ShitCompiler.CodeAnalysis.Syntax;
                 case SyntaxKind.MinusToken:
                     return 3;
 
+                case SyntaxKind.ExclamationEqualsToken:
                 case SyntaxKind.EqualsEqualsToken:
                     return 2;
 
