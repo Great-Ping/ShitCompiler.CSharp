@@ -311,8 +311,10 @@ public class SimpleSyntaxParser(
         if (_lexemeQueue.Peek().Kind != SyntaxKind.ElseKeyword)
             return null;
 
-        var keyword = _lexemeQueue.Next();
+        var keyword = _lexemeQueue.Peek();
+        _lexemeQueue.Next();
         
+        //Контекст внутри блока else
         SymbolBlock attachmentsBlock = _table.CreateNewSymbolBlock();
         var statement = ParseStatement(attachmentsBlock);
         _table.DismissBlock();
@@ -365,7 +367,8 @@ public class SimpleSyntaxParser(
         var unaryOperatorPrecedence = _lexemeQueue.Peek().Kind.GetUnaryOperatorPrecedence();
         if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
         {
-            var operatorToken = _lexemeQueue.Next();
+            var operatorToken = _lexemeQueue.Peek();
+            _lexemeQueue.Next();
             var operand = ParseBinaryExpression(unaryOperatorPrecedence);
             left = new UnaryExpressionSyntax(_table.Current, operatorToken, operand);
         }
@@ -380,7 +383,8 @@ public class SimpleSyntaxParser(
             if (precedence == 0 || precedence <= parentPrecedence)
                 break;
 
-            var operatorToken = _lexemeQueue.Next();
+            var operatorToken = _lexemeQueue.Peek();
+            _lexemeQueue.Next();
             var right = ParseBinaryExpression(precedence);
             left = new BinaryExpressionSyntax(_table.Current, left, operatorToken, right);
         }

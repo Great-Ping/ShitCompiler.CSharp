@@ -130,6 +130,8 @@ namespace ShitCompiler.CodeAnalysis.Syntax;
                     return ">";
                 case SyntaxKind.GreaterThanEqualsToken:
                     return ">=";
+                case SyntaxKind.ExclamationEqualsToken:
+                    return "!=";
                 case SyntaxKind.AmpersandAmpersandToken:
                     return "&&";
                 case SyntaxKind.BarBarToken:
@@ -146,6 +148,8 @@ namespace ShitCompiler.CodeAnalysis.Syntax;
                     return "}";
                 case SyntaxKind.ColonToken:
                     return ":";
+                case SyntaxKind.SemicolonToken:
+                    return ";";
                 case SyntaxKind.CommaToken:
                     return ",";
                 case SyntaxKind.ElseKeyword:

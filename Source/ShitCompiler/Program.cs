@@ -21,7 +21,7 @@ class Program
            
            abc();
            
-           val sd:string="12312" + 123 + 5 + 3 +3 + 5+ 6+ 4 + 4;      
+           val sd:string="12312" + 123 + 5 + 3 +3 - 5+ 6+ 4 + 4;      
            
            if(12334 != (2345 + 0))
                 sd = "abc";
@@ -43,9 +43,10 @@ class Program
         );
 
         IEnumerable<Lexeme> childern = parser.ParseCompilationUnit().GetLexemes();
+        
         Console.WriteLine(string.Join(
             "", 
-            childern.Select(x => (x.OriginalValue is not ";" or "}" or "{")
+            childern.Select(x => (x.Kind is not (SyntaxKind.SemicolonToken or SyntaxKind.OpenBraceToken or SyntaxKind.CloseBraceToken))
                 ? x.OriginalValue + " "
                 : x.OriginalValue + "\n"
                 )

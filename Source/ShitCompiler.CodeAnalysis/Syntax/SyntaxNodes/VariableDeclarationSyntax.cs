@@ -21,7 +21,8 @@ public sealed record VariableDeclarationSyntax(
             Identifier,
             TypeClause,
             EqualsToken,
-            Initializer
+            Initializer,
+            SemicolonToken
         }.Where(n => n is not null)!;
     }
 
