@@ -9,7 +9,17 @@ public sealed record CompilationUnitSyntax(
     Lexeme EndOfFileToken
 ) : ISyntaxNode
 {
+
     public SyntaxKind Kind => SyntaxKind.CompilationUnit;
+    public static CompilationUnitSyntax Empty { get; } = new(
+        new SymbolBlock(
+            null,
+            ImmutableDictionary<string, Symbol>.Empty
+        ),
+        ImmutableArray<MemberSyntax>.Empty,
+        new Lexeme(SyntaxKind.EndToken, String.Empty, Location.Zero)
+    );
+
     public IEnumerable<ISyntaxNode> GetChildren()
         => Members;
 

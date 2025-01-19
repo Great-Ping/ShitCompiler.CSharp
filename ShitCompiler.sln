@@ -1,7 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShitCompiler", "Source\ShitCompiler\ShitCompiler.csproj", "{C4203706-339F-4B5A-BE82-9104143592B6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShitCompiler.CodeAnalysis", "Source\ShitCompiler.CodeAnalysis\ShitCompiler.CodeAnalysis.csproj", "{E5DB8A84-F217-46B5-9845-986527276993}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ui", "Ui", "{CA4DB819-A594-4ADD-8B37-0B2AA3A2E360}"
@@ -20,10 +18,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C4203706-339F-4B5A-BE82-9104143592B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C4203706-339F-4B5A-BE82-9104143592B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C4203706-339F-4B5A-BE82-9104143592B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C4203706-339F-4B5A-BE82-9104143592B6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E5DB8A84-F217-46B5-9845-986527276993}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E5DB8A84-F217-46B5-9845-986527276993}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5DB8A84-F217-46B5-9845-986527276993}.Release|Any CPU.ActiveCfg = Release|Any CPU

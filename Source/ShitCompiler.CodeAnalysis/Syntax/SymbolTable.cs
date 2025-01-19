@@ -30,7 +30,7 @@ public record SymbolBlock(
     IDictionary<string, Symbol> Symbols
 )
 {
-
+    
     public Symbol? Find(Lexeme identifier)
     {
         return Find(identifier.OriginalValue, identifier.Start);

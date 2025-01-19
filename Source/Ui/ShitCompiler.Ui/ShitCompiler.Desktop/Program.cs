@@ -2,7 +2,7 @@
 using Avalonia;
 using ShitCompiler.Application;
 
-namespace ShitCompiler.Ui.Desktop;
+namespace ShitCompiler.Desktop;
 
 sealed class Program
 {
