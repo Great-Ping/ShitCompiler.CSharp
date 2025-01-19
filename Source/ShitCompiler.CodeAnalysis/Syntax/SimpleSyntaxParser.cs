@@ -10,12 +10,12 @@ namespace ShitCompiler.CodeAnalysis.Syntax;
 public class SimpleSyntaxParser(
     LexemeQueue lexemeQueue,
     SymbolTable table,
-    ISyntaxErrorsHandlingStrategy errorsHandler
+    ISyntaxErrorsHandler errorsHandler
 ) : ISyntaxParser
 {
     private readonly LexemeQueue _lexemeQueue = lexemeQueue;
     private readonly SymbolTable _table = table;
-    private readonly ISyntaxErrorsHandlingStrategy _errorsHandler = errorsHandler;
+    private readonly ISyntaxErrorsHandler _errorsHandler = errorsHandler;
 
     private Lexeme MatchToken(SyntaxKind kind)
     {

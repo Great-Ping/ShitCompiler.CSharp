@@ -5,7 +5,7 @@ namespace ShitCompiler.CodeAnalysis.Syntax;
 public class ParseException(ParseError error)
     : Exception($"{error.Location.LineIndex}.{error.Location.SymbolIndex}:{error.Message}");
 
-public class UebanErrorsHandlingStrategy: ISyntaxErrorsHandlingStrategy
+public class UebanErrorsHandler: ISyntaxErrorsHandler
 {
     public void Handle<T>(T error) where T : ParseError
     {

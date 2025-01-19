@@ -2,9 +2,9 @@ using ShitCompiler.CodeAnalysis.Syntax.Errors;
 
 namespace ShitCompiler.CodeAnalysis.Syntax;
 
-public class AccumulatingErrorsHandlingStrategy(
+public class AccumulatingErrorsHandler(
     ICollection<ParseError> errors
-): ISyntaxErrorsHandlingStrategy
+): ISyntaxErrorsHandler
 {
     public void Handle<T>(T error) where T : ParseError
     {

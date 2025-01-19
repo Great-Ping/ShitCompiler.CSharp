@@ -32,7 +32,7 @@ public partial class MainViewModel : ViewModelBase
         SimpleSyntaxParser parser = new SimpleSyntaxParser(
             lexems, 
             new SymbolTable(), 
-            new AccumulatingErrorsHandlingStrategy(errors)
+            new AccumulatingErrorsHandler(errors)
         );
         
         SyntaxTree.Root = SyntaxTreeNode.FromSyntaxNode(
