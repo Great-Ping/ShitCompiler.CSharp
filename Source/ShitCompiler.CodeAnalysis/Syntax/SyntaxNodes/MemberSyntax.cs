@@ -1,6 +1,6 @@
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
-public record MemberSyntax(
+public abstract record MemberSyntax(
     SymbolBlock SymbolBlock,
     SyntaxKind Kind
 ) : SyntaxNode(Kind);

@@ -6,7 +6,13 @@ using ShitCompiler.CodeAnalysis.Syntax;
 public sealed record IdentifierTypeSyntax(
     SymbolBlock SymbolBlock,
     Lexeme Identifier
-) : TypeSyntax(SymbolBlock, SyntaxKind.IdentifierTypeSyntax);
+) : TypeSyntax(SymbolBlock, SyntaxKind.IdentifierTypeSyntax)
+{
+    public override IEnumerable<ISyntaxNode> GetChildren()
+    {
+        return [Identifier];
+    }
+}
 
 
 public sealed record ArrayTypeSyntax(
@@ -15,7 +21,19 @@ public sealed record ArrayTypeSyntax(
     Lexeme OpenBracket,
     Lexeme<long> ArraySizeNumber,
     Lexeme CloseBracket
-) : TypeSyntax(SymbolBlock, SyntaxKind.ArrayTypeSyntax);
+) : TypeSyntax(SymbolBlock, SyntaxKind.ArrayTypeSyntax)
+{
+    public override IEnumerable<ISyntaxNode> GetChildren()
+    {
+        return
+        [
+            Identifier,
+            OpenBracket,
+            ArraySizeNumber,
+            CloseBracket
+        ];
+    }
+}
 
 public abstract record TypeSyntax(
     SymbolBlock SymbolBlock,

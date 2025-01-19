@@ -8,4 +8,19 @@ public record CallExpressionSyntax(
     Lexeme OpenParenthesisToken,
     SeparatedSyntaxList<ExpressionSyntax> Aarguments,
     Lexeme CloseParenthesisToken
-) : ExpressionSyntax(SymbolBlock, SyntaxKind.CallExpression);
+) : ExpressionSyntax(SymbolBlock, SyntaxKind.CallExpression)
+{
+    public override IEnumerable<ISyntaxNode> GetChildren()
+    {
+        return Enumerable
+            .Concat<ISyntaxNode>(
+                [
+                    Identifier,
+                    OpenParenthesisToken
+                ],
+                Aarguments.GetWithSeparators()
+            ).Concat(
+                [CloseParenthesisToken]
+            );
+    }
+}

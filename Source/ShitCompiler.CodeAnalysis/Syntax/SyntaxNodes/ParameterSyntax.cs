@@ -12,7 +12,8 @@ public sealed record ParameterSyntax(
 ) {
 
     public override IEnumerable<ISyntaxNode> GetChildren() {
-        return [
+        return 
+        [
             Identifier,
             Type
         ];

@@ -6,7 +6,15 @@ public record BinaryExpressionSyntax(
     SymbolBlock SymbolBlock, 
     ExpressionSyntax Left,
     Lexeme Operand,
-    ExpressionSyntax right
+    ExpressionSyntax Right
 ) : ExpressionSyntax(SymbolBlock, SyntaxKind.BinaryExpression) {
-    
+    public override IEnumerable<ISyntaxNode> GetChildren()
+    {
+        return
+        [
+            Left,
+            Operand,
+            Right
+        ];
+    }
 }

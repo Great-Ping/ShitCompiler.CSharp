@@ -4,6 +4,5 @@ public abstract record SyntaxNode(
     SyntaxKind Kind
 ): ISyntaxNode
 {
-    public virtual IEnumerable<ISyntaxNode> GetChildren()
-        => [];
+    public abstract IEnumerable<ISyntaxNode> GetChildren();
 }

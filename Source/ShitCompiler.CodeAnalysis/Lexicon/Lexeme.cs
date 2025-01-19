@@ -7,7 +7,11 @@ public record Lexeme(
     SyntaxKind Kind,
     string OriginalValue,
     Location Start
-) : SyntaxNode(Kind);
+) : SyntaxNode(Kind)
+{
+    public override IEnumerable<ISyntaxNode> GetChildren()
+         => [];
+};
 
 public record Lexeme<T>(
     SyntaxKind Kind, 

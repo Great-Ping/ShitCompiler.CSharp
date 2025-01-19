@@ -3,6 +3,7 @@ using System.Xml.Schema;
 using ShitCompiler.CodeAnalysis;
 using ShitCompiler.CodeAnalysis.Lexicon;
 using ShitCompiler.CodeAnalysis.Syntax;
+using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 namespace ShitCompiler;
 
@@ -29,19 +30,10 @@ class Program
                 sd = "abc2";
             
 
-        """;
-        Console.WriteLine(testInput);
+        """;;
         TextCursor cursor = new(testInput.AsMemory());
         ILexer lexer = new SimpleLexer(cursor);
 
-        //Lexeme? lexeme = null;
-        //while (lexeme?.Kind is not SyntaxKind.EndToken or SyntaxKind.BadToken)
-        //{
-        //    lexeme = lexer.ScanNext();
-        //    Console.WriteLine(lexeme);
-        //}
-
-        
         ISyntaxParser parser = new SimpleSyntaxParser(
             new LexemeQueue(
                 lexer
@@ -49,13 +41,15 @@ class Program
             new SymbolTable(),
             new UebanErrorsHandlingStrategy()
         );
-        
-        Console.WriteLine(JsonSerializer.Serialize(
-            parser.ParseCompilationUnit(),
-            new JsonSerializerOptions()
-            {
-                WriteIndented = true,
-            }
-        ));
+
+        IEnumerable<Lexeme> childern = parser.ParseCompilationUnit().GetLexemes();
+        Console.WriteLine(string.Join(
+            "", 
+            childern.Select(x => (x.OriginalValue is not ";" or "}" or "{")
+                ? x.OriginalValue + " "
+                : x.OriginalValue + "\n"
+                )
+            )
+        );
     }
 }

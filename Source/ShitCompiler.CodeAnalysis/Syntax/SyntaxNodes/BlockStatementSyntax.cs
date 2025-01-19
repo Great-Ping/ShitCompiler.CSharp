@@ -5,7 +5,19 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record BlockStatementSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme OpenBraceToken, 
-    ImmutableArray<StatementSyntax> Statements, 
+    Lexeme OpenBraceToken,
+    ImmutableArray<StatementSyntax> Statements,
     Lexeme CloseBraceToken
-): StatementSyntax(SymbolBlock, SyntaxKind.BlockStatement);
+) : StatementSyntax(SymbolBlock, SyntaxKind.BlockStatement)
+{
+    public override IEnumerable<ISyntaxNode> GetChildren()
+    {
+        return Enumerable
+            .Concat<ISyntaxNode>(
+                [OpenBraceToken],
+                Statements
+            ).Concat(
+                [CloseBraceToken]
+            );
+    }
+}

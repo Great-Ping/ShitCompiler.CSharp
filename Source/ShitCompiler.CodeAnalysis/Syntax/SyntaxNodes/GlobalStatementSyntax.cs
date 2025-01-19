@@ -1,6 +1,15 @@
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record GlobalStatementSyntax(
-    SymbolBlock Block, 
+    SymbolBlock SymbolBlock,
     StatementSyntax Statement
-) : MemberSyntax(Block, SyntaxKind.GlobalStatement);
+) : MemberSyntax(SymbolBlock, SyntaxKind.GlobalStatement)
+{
+    public override IEnumerable<ISyntaxNode> GetChildren()
+    {
+        return
+        [
+            Statement
+        ];
+    }
+}
