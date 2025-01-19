@@ -65,18 +65,6 @@ namespace ShitCompiler.CodeAnalysis.Syntax;
                     return SyntaxKind.ReturnKeyword;
                 case "var":
                     return SyntaxKind.VarKeyword;
-                
-                case "string":
-                    return SyntaxKind.StringType;
-                case "double":
-                    return SyntaxKind.DoubleType;
-                case "long":
-                    return SyntaxKind.LongType;
-                case "char":
-                    return SyntaxKind.CharacterType;
-                case "bool":
-                    return SyntaxKind.BooleanType;
-                
                 default:
                     return SyntaxKind.IdentifierToken;
             }

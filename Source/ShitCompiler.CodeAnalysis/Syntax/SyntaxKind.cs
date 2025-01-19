@@ -172,11 +172,4 @@ public enum SyntaxKind
     
     IdentifierTypeSyntax,
     ArrayTypeSyntax,
-    
-    StringType,
-    LongType,
-    CharacterType,
-    BooleanType,
-    Type,
-    DoubleType
 }

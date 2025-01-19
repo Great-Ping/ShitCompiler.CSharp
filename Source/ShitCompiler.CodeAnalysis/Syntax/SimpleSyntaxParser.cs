@@ -33,23 +33,6 @@ public class SimpleSyntaxParser(
 
         return new Lexeme(kind, String.Empty, currentToken.Start);
     }
-
-    private Lexeme MatchToken(Func<SyntaxKind, bool> check, SyntaxKind asDefault)
-    {
-        Lexeme currentToken = _lexemeQueue.Peek();
-        if (check(currentToken.Kind))
-        {
-            _lexemeQueue.Next();
-            return currentToken;
-        }
-
-        _errorsHandler.Handle(new UnexpectedTokenError(
-            currentToken.Start,
-            $"Waited: {asDefault} Returned: {currentToken.Kind}"
-        ));
-
-        return new Lexeme(asDefault, String.Empty, currentToken.Start);
-    }
     
     public CompilationUnitSyntax ParseCompilationUnit()
     {
@@ -280,7 +263,7 @@ public class SimpleSyntaxParser(
 
     private TypeSyntax ParseType()
     {
-        var type = MatchToken((kind) => kind.IsType(), SyntaxKind.Type);
+        var type = MatchToken(SyntaxKind.IdentifierToken);
 
         if (_lexemeQueue.Peek(1).Kind == SyntaxKind.OpenBracketToken)
         {
