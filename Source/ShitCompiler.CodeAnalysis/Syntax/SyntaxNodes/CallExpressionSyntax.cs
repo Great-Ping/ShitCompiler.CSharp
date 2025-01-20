@@ -6,7 +6,7 @@ public record CallExpressionSyntax(
     SymbolBlock SymbolBlock,
     Lexeme Identifier,
     Lexeme OpenParenthesisToken,
-    SeparatedSyntaxList<ExpressionSyntax> Aarguments,
+    SeparatedSyntaxList<ExpressionSyntax> Arguments,
     Lexeme CloseParenthesisToken
 ) : ExpressionSyntax(SymbolBlock, SyntaxKind.CallExpression)
 {
@@ -18,7 +18,7 @@ public record CallExpressionSyntax(
                     Identifier,
                     OpenParenthesisToken
                 ],
-                Aarguments.GetWithSeparators()
+                Arguments.GetWithSeparators()
             ).Concat(
                 [CloseParenthesisToken]
             );

@@ -360,10 +360,10 @@ public class SimpleSyntaxParser(
         if (_lexemeQueue.Peek().Kind == SyntaxKind.OpenBracketToken)
         {
             var openBracket = MatchToken(SyntaxKind.OpenBracketToken);
-            var expression = ParseExpression();
+            var expression = ParseBinaryExpression();
             var closeBracket = MatchToken(SyntaxKind.CloseBracketToken);
             operatorToken = MatchToken(SyntaxKind.EqualsToken);
-            right = ParseExpression();
+            right = ParseBinaryExpression();
             return new ArrayAssigmentExpressionSyntax(
                 _table.Current,
                 identifierToken,
@@ -434,7 +434,7 @@ public class SimpleSyntaxParser(
             
             case SyntaxKind.IdentifierToken:
             default:
-                return ParseNameOrCallExpression();
+                return ParseNameOrCallOrIndexExpression();
         }
     }
 
@@ -477,13 +477,27 @@ public class SimpleSyntaxParser(
         return new LiteralExpressionSyntax<char>(_table.Current, stringToken, stringToken.ParsedValue);
     }
 
-    private ExpressionSyntax ParseNameOrCallExpression()
+    private ExpressionSyntax ParseNameOrCallOrIndexExpression()
     {
         if (_lexemeQueue.Peek().Kind == SyntaxKind.IdentifierToken
             && _lexemeQueue.Peek(1).Kind == SyntaxKind.OpenParenthesisToken
         ) return ParseCallExpression();
+        
+        if (_lexemeQueue.Peek().Kind == SyntaxKind.IdentifierToken
+            && _lexemeQueue.Peek(1).Kind == SyntaxKind.OpenBracketToken
+           ) return ParseIndexExpression();
 
+        
         return ParseNameExpression();
+    }
+
+    private ExpressionSyntax ParseIndexExpression()
+    {
+        var identifier = MatchToken(SyntaxKind.IdentifierToken);
+        var openParenthesisToken = MatchToken(SyntaxKind.OpenBracketToken);
+        var arguments = ParseArguments(SyntaxKind.CloseBracketToken);
+        var closeParenthesisToken = MatchToken(SyntaxKind.CloseBracketToken);
+        return new IndexExpressionSyntax(_table.Current, identifier, openParenthesisToken, arguments, closeParenthesisToken);
     }
 
     private ExpressionSyntax ParseCallExpression()

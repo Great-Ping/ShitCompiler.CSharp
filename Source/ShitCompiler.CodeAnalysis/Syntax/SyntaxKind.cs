@@ -173,5 +173,6 @@ public enum SyntaxKind
     IdentifierTypeSyntax,
     ArrayTypeSyntax,
     ArrayExpression,
-    ArrayAssigmentExpression
+    ArrayAssigmentExpression,
+    IndexExpression
 }
