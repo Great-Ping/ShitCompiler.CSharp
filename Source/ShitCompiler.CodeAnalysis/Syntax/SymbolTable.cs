@@ -99,7 +99,7 @@ public class SymbolTable
 
     public void AddSymbol(Symbol symbol)
     {
-        _current.Symbols.Add(symbol.Identifier.OriginalValue, symbol);
+        _current.Symbols.TryAdd(symbol.Identifier.OriginalValue, symbol);
     }
 
     public SymbolBlock CreateNewSymbolBlock()

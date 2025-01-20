@@ -19,7 +19,7 @@ public sealed record ArrayTypeSyntax(
     SymbolBlock SymbolBlock,
     Lexeme Identifier,
     Lexeme OpenBracket,
-    Lexeme<long> ArraySizeNumber,
+    ExpressionSyntax ArraySizeNumber,
     Lexeme CloseBracket
 ) : TypeSyntax(SymbolBlock, SyntaxKind.ArrayTypeSyntax)
 {

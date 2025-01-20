@@ -2,11 +2,33 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
+
+public sealed record ArrayAssigmentExpressionSyntax(
+    SymbolBlock SymbolBlock,
+    Lexeme Identifier,
+    Lexeme OpenBracket,
+    ExpressionSyntax Expression,
+    Lexeme CloseBracket,
+    Lexeme Operator,
+    ExpressionSyntax Right
+) : ExpressionSyntax(SymbolBlock, SyntaxKind.ArrayAssigmentExpression)
+{
+    public override IEnumerable<ISyntaxNode> GetChildren()
+    {
+        yield return Identifier;
+        yield return OpenBracket;
+        yield return Expression;
+        yield return CloseBracket;
+        yield return Operator;
+        yield return Right;
+    }
+}
+
 public sealed record AssignmentExpressionSyntax(
     SymbolBlock SymbolBlock,
     Lexeme Identifier,
     Lexeme Operator,
-    ExpressionSyntax Left
+    ExpressionSyntax Right
 ) : ExpressionSyntax(SymbolBlock, SyntaxKind.AssignmentExpression)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()
@@ -14,7 +36,7 @@ public sealed record AssignmentExpressionSyntax(
         return [
             Identifier,
             Operator,
-            Left
+            Right
         ];
     }
 };
