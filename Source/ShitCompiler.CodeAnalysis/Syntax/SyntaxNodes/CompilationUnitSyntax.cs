@@ -7,10 +7,8 @@ public sealed record CompilationUnitSyntax(
     SymbolBlock Block,
     ImmutableArray<MemberSyntax> Members,
     Lexeme EndOfFileToken
-) : ISyntaxNode
+) : SyntaxNode(SyntaxKind.CompilationUnit)
 {
-
-    public SyntaxKind Kind => SyntaxKind.CompilationUnit;
     public static CompilationUnitSyntax Empty { get; } = new(
         new SymbolBlock(
             null,
@@ -20,7 +18,7 @@ public sealed record CompilationUnitSyntax(
         new Lexeme(SyntaxKind.EndToken, String.Empty, Location.Zero)
     );
 
-    public IEnumerable<ISyntaxNode> GetChildren()
+    public override IEnumerable<ISyntaxNode> GetChildren()
         => Members;
 
     public IEnumerable<Lexeme> GetLexemes()
