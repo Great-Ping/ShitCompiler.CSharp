@@ -5,7 +5,7 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 public sealed record ExpressionStatementSyntax(
     SymbolBlock SymbolBlock,
     ExpressionSyntax Expression,
-    Lexeme Semicolon
+    Lexicon.Lexeme Semicolon
 ): StatementSyntax(
     SymbolBlock,
     SyntaxKind.ExpressionStatement

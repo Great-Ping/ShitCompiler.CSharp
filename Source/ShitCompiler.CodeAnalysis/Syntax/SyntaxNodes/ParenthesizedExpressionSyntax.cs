@@ -4,9 +4,9 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record ParenthesizedExpressionSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme Left,
+    Lexicon.Lexeme Left,
     ExpressionSyntax Expression,
-    Lexeme Right
+    Lexicon.Lexeme Right
 ) : ExpressionSyntax(SymbolBlock, SyntaxKind.ParenthesizedExpression)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()

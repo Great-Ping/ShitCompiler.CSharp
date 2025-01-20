@@ -5,11 +5,11 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record ArrayAssigmentExpressionSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme Identifier,
-    Lexeme OpenBracket,
+    Lexicon.Lexeme Identifier,
+    Lexicon.Lexeme OpenBracket,
     ExpressionSyntax Expression,
-    Lexeme CloseBracket,
-    Lexeme Operator,
+    Lexicon.Lexeme CloseBracket,
+    Lexicon.Lexeme Operator,
     ExpressionSyntax Right
 ) : ExpressionSyntax(SymbolBlock, SyntaxKind.ArrayAssigmentExpression)
 {
@@ -26,8 +26,8 @@ public sealed record ArrayAssigmentExpressionSyntax(
 
 public sealed record AssignmentExpressionSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme Identifier,
-    Lexeme Operator,
+    Lexicon.Lexeme Identifier,
+    Lexicon.Lexeme Operator,
     ExpressionSyntax Right
 ) : ExpressionSyntax(SymbolBlock, SyntaxKind.AssignmentExpression)
 {

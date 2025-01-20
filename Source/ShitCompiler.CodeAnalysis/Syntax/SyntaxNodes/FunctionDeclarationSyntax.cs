@@ -6,11 +6,11 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record FunctionDeclarationSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme Funk,
-    Lexeme Identifier,
-    Lexeme OpenParenthesisToken,
+    Lexicon.Lexeme Funk,
+    Lexicon.Lexeme Identifier,
+    Lexicon.Lexeme OpenParenthesisToken,
     SeparatedSyntaxList<ParameterSyntax> Parameters,
-    Lexeme CloseParenthesisToken,
+    Lexicon.Lexeme CloseParenthesisToken,
     TypeClauseSyntax Type,
     BlockStatementSyntax Block
 ): MemberSyntax(SymbolBlock, SyntaxKind.FunctionDeclaration) {

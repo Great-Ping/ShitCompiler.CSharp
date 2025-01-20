@@ -4,9 +4,9 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record ReturnStatementSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme Keyword,
+    Lexicon.Lexeme Keyword,
     ExpressionSyntax? Expression,
-    Lexeme Semicolon
+    Lexicon.Lexeme Semicolon
 ) : StatementSyntax(SymbolBlock, SyntaxKind.ReturnStatement)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()

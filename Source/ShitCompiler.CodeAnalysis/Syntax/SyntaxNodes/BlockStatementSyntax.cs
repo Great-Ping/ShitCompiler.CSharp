@@ -5,9 +5,9 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record BlockStatementSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme OpenBraceToken,
+    Lexicon.Lexeme OpenBraceToken,
     ImmutableArray<StatementSyntax> Statements,
-    Lexeme CloseBraceToken
+    Lexicon.Lexeme CloseBraceToken
 ) : StatementSyntax(SymbolBlock, SyntaxKind.BlockStatement)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()

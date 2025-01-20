@@ -4,7 +4,7 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record ParameterSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme Identifier,
+    Lexicon.Lexeme Identifier,
     TypeClauseSyntax Type
 ): MemberSyntax(
     SymbolBlock,

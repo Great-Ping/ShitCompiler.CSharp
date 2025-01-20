@@ -6,24 +6,24 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 public sealed record CompilationUnitSyntax(
     SymbolBlock Block,
     ImmutableArray<MemberSyntax> Members,
-    Lexeme EndOfFileToken
+    Lexicon.Lexeme EndOfFileToken
 ) : SyntaxNode(SyntaxKind.CompilationUnit)
 {
     public static CompilationUnitSyntax Empty { get; } = new(
         new SymbolBlock(
             null,
-            ImmutableDictionary<string, Symbol>.Empty
+            ImmutableDictionary<string, Lexeme>.Empty
         ),
         ImmutableArray<MemberSyntax>.Empty,
-        new Lexeme(SyntaxKind.EndToken, String.Empty, Location.Zero)
+        new Lexicon.Lexeme(SyntaxKind.EndToken, String.Empty, Location.Zero)
     );
 
     public override IEnumerable<ISyntaxNode> GetChildren()
         => Members;
 
-    public IEnumerable<Lexeme> GetLexemes()
+    public IEnumerable<Lexicon.Lexeme> GetLexemes()
     {
-        List<Lexeme> lexemes = new List<Lexeme>();
+        List<Lexicon.Lexeme> lexemes = new List<Lexicon.Lexeme>();
         List<ISyntaxNode> syntaxNodes = GetChildren().ToList();
 
         while (syntaxNodes.Count > 0)
@@ -31,7 +31,7 @@ public sealed record CompilationUnitSyntax(
             ISyntaxNode node = syntaxNodes.First();
             syntaxNodes.RemoveAt(0);
 
-            if (node is Lexeme lexeme)
+            if (node is Lexicon.Lexeme lexeme)
             {
                 lexemes.Add(lexeme);
                 continue;

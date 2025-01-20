@@ -5,9 +5,9 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 public record ArrayExpressionSyntax(
     SymbolBlock SymbolBlock,
     SyntaxKind Kind,
-    Lexeme OpenBrace,
+    Lexicon.Lexeme OpenBrace,
     SeparatedSyntaxList<ExpressionSyntax> Expressions,
-    Lexeme CloseBrace
+    Lexicon.Lexeme CloseBrace
 ) : ExpressionSyntax(SymbolBlock, Kind)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()

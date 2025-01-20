@@ -4,12 +4,12 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record VariableDeclarationSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme Keyword,
-    Lexeme Identifier,
+    Lexicon.Lexeme Keyword,
+    Lexicon.Lexeme Identifier,
     TypeClauseSyntax? TypeClause,
-    Lexeme EqualsToken,
+    Lexicon.Lexeme EqualsToken,
     ExpressionSyntax Initializer,
-    Lexeme SemicolonToken
+    Lexicon.Lexeme SemicolonToken
 ): StatementSyntax(
     SymbolBlock,
     SyntaxKind.VariableDeclaration

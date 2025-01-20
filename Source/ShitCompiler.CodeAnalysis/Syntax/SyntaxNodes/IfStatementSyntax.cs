@@ -4,7 +4,7 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record IfStatementSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme IfKeyword,
+    Lexicon.Lexeme IfKeyword,
     ExpressionSyntax Condition,
     StatementSyntax ThenStatement,
     ElseClauseSyntax? ElseClause

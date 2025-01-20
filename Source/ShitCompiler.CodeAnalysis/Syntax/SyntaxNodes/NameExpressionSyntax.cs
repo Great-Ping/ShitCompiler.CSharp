@@ -4,7 +4,7 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record NameExpressionSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme Identifier
+    Lexicon.Lexeme Identifier
 ) : ExpressionSyntax(SymbolBlock, SyntaxKind.NameExpression)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()

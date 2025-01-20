@@ -2,74 +2,50 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 
 namespace ShitCompiler.CodeAnalysis.Syntax;
 
-public enum SymbolTypes
-{
-    Void    = 0b000001,
-    Array   = 0b000010,
-    ULong    = 0b000100,
-    Char    = 0b001000,
-    String  = 0b010000, 
-    Function= 0b100000,
-    Unknown
-}
-
-public record Symbol
-{
-    public Lexeme Identifier { get; set; }
-    public SymbolTypes Type { get; set; }
-
-    public Symbol(Lexeme identifier, SymbolTypes type = SymbolTypes.Unknown)
-    {
-        Identifier = identifier;
-        Type = type;
-    }
-};
-
 public record SymbolBlock(
     SymbolBlock? Parent,
-    IDictionary<string, Symbol> Symbols
+    IDictionary<string, Lexeme> Symbols
 )
 {
-    
-    public Symbol? Find(Lexeme identifier)
+    public Lexeme? Find(Lexeme identifier)
     {
         return Find(identifier.OriginalValue, identifier.Start);
     }
 
-    public Symbol? FindInBlock(Lexeme identifier)
+    public Lexeme? FindInBlock(Lexeme identifier)
     {
         return FindInBlock(identifier.OriginalValue, identifier.Start);
     }
 
-    public Symbol? Find(string identifier, Location location)
+    public Lexeme? Find(string identifier, Location location)
     {
-        if (!Symbols.TryGetValue(identifier, out Symbol? value))
+        if (!Symbols.TryGetValue(identifier, out Lexeme? value))
             return Parent?.Find(identifier, location);
 
-        if (value.Identifier.Start.AbsoluteIndex > location.AbsoluteIndex)
+        if (value.Start.AbsoluteIndex > location.AbsoluteIndex)
             return Parent?.Find(identifier, location);
 
         return value;
     }
 
-    public Symbol? FindInBlock(string identifier, Location location)
+    public Lexeme? FindInBlock(string identifier, Location location)
     {
-        if (!Symbols.TryGetValue(identifier, out Symbol? value))
+        if (!Symbols.TryGetValue(identifier, out Lexeme? value))
             return null;
         
-        if (value.Identifier.Start.AbsoluteIndex > location.AbsoluteIndex)
+        if (value.Start.AbsoluteIndex > location.AbsoluteIndex)
             return null;
 
         return value;
     }
 
-    public void AddSymbol(Symbol symbol)
+    public void AddSymbol(Lexeme lexeme)
     {
-        Symbols.Add(symbol.Identifier.OriginalValue, symbol);
+        Symbols.Add(lexeme.OriginalValue, lexeme);
     }
 
     public SymbolBlock CreateChild(){
-        return new SymbolBlock(this, new Dictionary<string, Symbol>());
+        return new SymbolBlock(this, new Dictionary<string, Lexeme>());
     }
 };
 
@@ -78,18 +54,52 @@ public class SymbolTable
     private SymbolBlock _current;
 
     public SymbolTable(){
-        var root = new SymbolBlock(null, new Dictionary<string, Symbol>());
+        var root = new SymbolBlock(null, new Dictionary<string, Lexeme>());
+        InitializeBaseTypes(root);
         _current = root;
     }
-    
+
+    private static void InitializeBaseTypes(SymbolBlock root)
+    {
+        root.AddSymbol(new Lexeme(
+            SyntaxKind.IdentifierToken, 
+            "long", 
+            Location.Zero
+        ));
+        
+        root.AddSymbol(new Lexeme(
+            SyntaxKind.IdentifierToken,
+            "double",
+            Location.Zero
+        ));
+        
+        root.AddSymbol(new Lexeme(
+            SyntaxKind.IdentifierToken,
+            "char",
+            Location.Zero
+        ));
+        
+        root.AddSymbol(new Lexeme(
+            SyntaxKind.IdentifierToken,
+            "string",
+            Location.Zero
+        ));
+        
+        root.AddSymbol(new Lexeme(
+            SyntaxKind.IdentifierToken,
+            "bool",
+            Location.Zero
+        ));
+    }
+
     public SymbolBlock Current => _current;
 
-    public Symbol? Find(string identifier, Location location)
+    public Lexeme? Find(string identifier, Location location)
     {
         return _current.Find(identifier, location);
     }
 
-    public Symbol? Find(Lexeme lexeme)
+    public Lexeme? Find(Lexicon.Lexeme lexeme)
     {
         if (lexeme.Kind != SyntaxKind.IdentifierToken)
             return null;
@@ -97,9 +107,9 @@ public class SymbolTable
         return _current.Find(lexeme.OriginalValue, lexeme.Start);
     }
 
-    public void AddSymbol(Symbol symbol)
+    public void AddSymbol(Lexeme lexeme)
     {
-        _current.Symbols.TryAdd(symbol.Identifier.OriginalValue, symbol);
+        _current.Symbols.TryAdd(lexeme.OriginalValue, lexeme);
     }
 
     public SymbolBlock CreateNewSymbolBlock()

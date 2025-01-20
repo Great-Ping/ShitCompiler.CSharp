@@ -16,10 +16,11 @@ public class SimpleSyntaxParser(
     private readonly LexemeQueue _lexemeQueue = lexemeQueue;
     private readonly SymbolTable _table = table;
     private readonly ISyntaxErrorsHandler _errorsHandler = errorsHandler;
+    private readonly TypeInference _typeInference = new(errorsHandler);
 
-    private Lexeme MatchToken(SyntaxKind kind)
+    private Lexicon.Lexeme MatchToken(SyntaxKind kind)
     {
-        Lexeme currentToken = _lexemeQueue.Peek();
+        Lexicon.Lexeme currentToken = _lexemeQueue.Peek();
         if (currentToken.Kind == kind)
         {
             _lexemeQueue.Next();
@@ -31,14 +32,14 @@ public class SimpleSyntaxParser(
             $"Waited: {kind} Returned: {currentToken.Kind}"
         ));
 
-        return new Lexeme(kind, String.Empty, currentToken.Start);
+        return new Lexicon.Lexeme(kind, String.Empty, currentToken.Start);
     }
     
     public CompilationUnitSyntax ParseCompilationUnit()
     {
         //https://github.com/terrajobst/minsk/blob/master/src/Minsk/CodeAnalysis/Syntax/Parser.cs#L77
         ImmutableArray<MemberSyntax> members = ParseMembers();
-        Lexeme eof = MatchToken(SyntaxKind.EndToken);
+        Lexicon.Lexeme eof = MatchToken(SyntaxKind.EndToken);
         return new CompilationUnitSyntax(_table.Current, members, eof);
     }
 
@@ -46,7 +47,7 @@ public class SimpleSyntaxParser(
     {
         var members = ImmutableArray.CreateBuilder<MemberSyntax>();
 
-        Lexeme currentToken = _lexemeQueue.Peek();
+        Lexicon.Lexeme currentToken = _lexemeQueue.Peek();
         while (currentToken.Kind != SyntaxKind.EndToken)
         {
             MemberSyntax member = ParseMember();
@@ -73,8 +74,8 @@ public class SimpleSyntaxParser(
 
     private MemberSyntax ParseFunctionDeclaration()
     {
-        Lexeme funk = MatchToken(SyntaxKind.FunkKeyword);
-        Lexeme identifier = MatchToken(SyntaxKind.IdentifierToken);
+        Lexicon.Lexeme funk = MatchToken(SyntaxKind.FunkKeyword);
+        Lexicon.Lexeme identifier = MatchToken(SyntaxKind.IdentifierToken);
         var funkDeclarationBlock = _table.Current;
 
         ///Проверкаа уникальности идентификатора
@@ -82,7 +83,7 @@ public class SimpleSyntaxParser(
         if (symbol != null)
             _errorsHandler.Handle(new UniquenessSymbolError(identifier));
 
-        _table.AddSymbol(new Symbol(identifier, SymbolTypes.Function | SymbolTypes.Void));
+        _table.AddSymbol(identifier);
         SymbolBlock funkBlock = _table.CreateNewSymbolBlock();
 
 
@@ -146,7 +147,7 @@ public class SimpleSyntaxParser(
     private ParameterSyntax ParseParameter()
     {
         var id = MatchToken(SyntaxKind.IdentifierToken);
-        _table.AddSymbol(new Symbol(id));
+        _table.AddSymbol(id);
         var type = ParseTypeClause();
         return new ParameterSyntax(
             _table.Current,
@@ -240,7 +241,7 @@ public class SimpleSyntaxParser(
         var keyword = MatchToken(expected);
 
         var identifier = MatchToken(SyntaxKind.IdentifierToken);
-        _table.AddSymbol(new(identifier));
+        _table.AddSymbol(identifier);
         
         var typeClause = ParseTypeClause();
         var equals = MatchToken(SyntaxKind.EqualsToken);
@@ -355,7 +356,7 @@ public class SimpleSyntaxParser(
     private ExpressionSyntax ParseAssignmentExpression()
     {
         var identifierToken = MatchToken(SyntaxKind.IdentifierToken);
-        Lexeme operatorToken;
+        Lexicon.Lexeme operatorToken;
         ExpressionSyntax right;
         if (_lexemeQueue.Peek().Kind == SyntaxKind.OpenBracketToken)
         {
@@ -407,7 +408,7 @@ public class SimpleSyntaxParser(
             var right = ParseBinaryExpression(precedence);
             left = new BinaryExpressionSyntax(_table.Current, left, operatorToken, right);
         }
-
+        
         return left;
     }
 
@@ -442,7 +443,7 @@ public class SimpleSyntaxParser(
     private ExpressionSyntax ParseParenthesizedExpression()
     {
         var left = MatchToken(SyntaxKind.OpenParenthesisToken);
-        var expression = ParseExpression();
+        var expression = ParseBinaryExpression();
         var right = MatchToken(SyntaxKind.CloseParenthesisToken);
         return new ParenthesizedExpressionSyntax(_table.Current, left, expression, right);
     }
@@ -455,7 +456,7 @@ public class SimpleSyntaxParser(
     }
     private ExpressionSyntax ParseRealNumberLiteral()
     {
-        var numberToken = (MatchToken(SyntaxKind.NumberToken) as Lexeme<long>)!;
+        var numberToken = (MatchToken(SyntaxKind.NumberToken) as Lexeme<double>)!;
         return new LiteralExpressionSyntax<double>(_table.Current, numberToken, numberToken.ParsedValue);
     }
 
@@ -518,7 +519,7 @@ public class SimpleSyntaxParser(
                _lexemeQueue.Peek().Kind != endToken &&
                _lexemeQueue.Peek().Kind != SyntaxKind.EndToken)
         {
-            var expression = ParseExpression();
+            var expression = ParseBinaryExpression();
             nodesAndSeparators.Add(expression);
 
             if (_lexemeQueue.Peek().Kind == SyntaxKind.CommaToken)

@@ -4,7 +4,7 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record ElseClauseSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme ElseKeyword,
+    Lexicon.Lexeme ElseKeyword,
     StatementSyntax ElseStatement
 ): MemberSyntax(
     SymbolBlock,

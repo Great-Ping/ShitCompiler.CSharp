@@ -5,7 +5,7 @@ using ShitCompiler.CodeAnalysis.Syntax;
 
 public sealed record IdentifierTypeSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme Identifier
+    Lexicon.Lexeme Identifier
 ) : TypeSyntax(SymbolBlock, SyntaxKind.IdentifierTypeSyntax)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()
@@ -17,10 +17,10 @@ public sealed record IdentifierTypeSyntax(
 
 public sealed record ArrayTypeSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme Identifier,
-    Lexeme OpenBracket,
+    Lexicon.Lexeme Identifier,
+    Lexicon.Lexeme OpenBracket,
     ExpressionSyntax ArraySizeNumber,
-    Lexeme CloseBracket
+    Lexicon.Lexeme CloseBracket
 ) : TypeSyntax(SymbolBlock, SyntaxKind.ArrayTypeSyntax)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()
@@ -43,7 +43,7 @@ public abstract record TypeSyntax(
 
 public sealed record TypeClauseSyntax(
     SymbolBlock SymbolBlock,
-    Lexeme ColonToken,
+    Lexicon.Lexeme ColonToken,
     TypeSyntax Type
 ) : SyntaxNode(SyntaxKind.TypeClause) {
 
