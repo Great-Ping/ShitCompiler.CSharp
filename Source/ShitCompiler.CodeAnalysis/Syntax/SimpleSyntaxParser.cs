@@ -244,7 +244,7 @@ public class SimpleSyntaxParser(
         
         var typeClause = ParseTypeClause();
         var equals = MatchToken(SyntaxKind.EqualsToken);
-        var initializer = ParseExpression();
+        var initializer = ParseBinaryExpression();
         var semicolon = MatchToken(SyntaxKind.SemicolonToken);
 
         return new VariableDeclarationSyntax(
