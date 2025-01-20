@@ -36,6 +36,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\ShitCompiler.CodeAnalysis\ShitCompiler.CodeAnalysis.csproj" />
+      <ProjectReference Include="..\..\ShitCompiler.CodeAnalysis\ShitCompiler.CodeAnalysis.csproj" />
     </ItemGroup>
 </Project>
