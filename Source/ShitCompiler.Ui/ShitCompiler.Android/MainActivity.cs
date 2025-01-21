@@ -1,4 +1,10 @@
-﻿using ShitCompiler.Application;
+﻿using Android.App;
+using Android.Content.PM;
+
+using Avalonia;
+using Avalonia.Android;
+
+using ShitCompiler.Application;
 
 namespace ShitCompiler.Android;
 

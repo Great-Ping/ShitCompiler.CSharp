@@ -456,8 +456,9 @@ public class SimpleSyntaxParser(
     }
     private ExpressionSyntax ParseRealNumberLiteral()
     {
-        var numberToken = (MatchToken(SyntaxKind.NumberToken) as Lexeme<double>)!;
-        return new LiteralExpressionSyntax<double>(_table.Current, numberToken, numberToken.ParsedValue);
+        var token = MatchToken(SyntaxKind.NumberToken);
+        var numberToken = token as Lexeme<double>;
+        return new LiteralExpressionSyntax<double>(_table.Current, token, numberToken?.ParsedValue ?? 0.0d);
     }
 
     private ExpressionSyntax ParseNumberLiteral()
@@ -468,14 +469,16 @@ public class SimpleSyntaxParser(
 
     private ExpressionSyntax ParseStringLiteral()
     {
-        var stringToken = (MatchToken(SyntaxKind.StringToken) as Lexeme<string>)!;
-        return new LiteralExpressionSyntax<string>(_table.Current, stringToken, stringToken.ParsedValue);
+        var token = MatchToken(SyntaxKind.StringToken);
+        var stringToken = token as Lexeme<string>;
+        return new LiteralExpressionSyntax<string>(_table.Current, token, stringToken?.ParsedValue ?? string.Empty);
     }
 
     private ExpressionSyntax ParseCharLiteral()
     {
-        var stringToken = (MatchToken(SyntaxKind.CharacterToken) as Lexeme<char>)!;
-        return new LiteralExpressionSyntax<char>(_table.Current, stringToken, stringToken.ParsedValue);
+        var token = MatchToken(SyntaxKind.CharacterToken);
+        var charToken = token as Lexeme<char>;
+        return new LiteralExpressionSyntax<char>(_table.Current, token, charToken?.ParsedValue ?? TextCursor.InvalidCharacter);
     }
 
     private ExpressionSyntax ParseNameOrCallOrIndexExpression()
