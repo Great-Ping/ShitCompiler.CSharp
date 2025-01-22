@@ -4,7 +4,7 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record ParameterSyntax(
     Lexeme Identifier,
-    TypeClauseSyntax Type
+    TypeClauseSyntax TypeClause
 ): MemberSyntax(
     SyntaxKind.ColonToken
 ) {
@@ -13,7 +13,7 @@ public sealed record ParameterSyntax(
         return 
         [
             Identifier,
-            Type
+            TypeClause
         ];
     }
 

@@ -10,7 +10,7 @@ public sealed record FunctionDeclarationSyntax(
     Lexeme OpenParenthesisToken,
     SeparatedSyntaxList<ParameterSyntax> Parameters,
     Lexeme CloseParenthesisToken,
-    TypeClauseSyntax Type,
+    TypeClauseSyntax TypeClause,
     BlockStatementSyntax Block
 ): MemberSyntax(SyntaxKind.FunctionDeclaration) {
 
@@ -24,7 +24,7 @@ public sealed record FunctionDeclarationSyntax(
                 Parameters.GetWithSeparators()
             ).Concat([
                 CloseParenthesisToken,
-                Type,
+                TypeClause,
                 Block
             ]);
     }

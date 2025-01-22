@@ -17,7 +17,7 @@ public sealed record IdentifierTypeSyntax(
 public sealed record ArrayTypeSyntax(
     Lexeme Identifier,
     Lexeme OpenBracket,
-    ExpressionSyntax ArraySizeNumber,
+    LiteralExpressionSyntax<long> ArraySizeNumber,
     Lexeme CloseBracket
 ) : TypeSyntax(SyntaxKind.ArrayTypeSyntax)
 {

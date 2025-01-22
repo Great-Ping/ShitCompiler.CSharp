@@ -8,6 +8,7 @@ using ShitCompiler.CodeAnalysis.Syntax;
 using ShitCompiler.CodeAnalysis.Syntax.Errors;
 using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 using ShitCompiler.Widgets;
+using ShitCompiler.CodeAnalysis.Semantics;
 
 namespace ShitCompiler.Pages;
 
@@ -28,14 +29,23 @@ public partial class MainViewModel : ViewModelBase
         );
         LexemeQueue lexems = new(lexer);
         List<ParseError> errors = new();
-        
+        AccumulatingErrorsHandler errosAccumulator = new(errors);
+
         SimpleSyntaxParser parser = new SimpleSyntaxParser(
             lexems,
             new AccumulatingErrorsHandler(errors)
         );
+        SemanticsParser semanticParser = new(
+            errosAccumulator
+        );
+
+        CompilationUnitSyntax compilationUnit = parser.ParseCompilationUnit();
+
+        if (errors.Count() == 0)
+            semanticParser.Parse(compilationUnit);
         
         SyntaxTree.Root = SyntaxTreeNode.FromSyntaxNode(
-            parser.ParseCompilationUnit()
+            compilationUnit
         );
         
         InfoOutput = String.Join(

@@ -15,7 +15,6 @@ public class SimpleSyntaxParser(
 {
     private readonly LexemeQueue _lexemeQueue = lexemeQueue;
     private readonly ISyntaxErrorsHandler _errorsHandler = errorsHandler;
-    private readonly TypeInference _typeInference = new(errorsHandler);
 
     private Lexeme MatchToken(SyntaxKind kind)
     {
@@ -254,7 +253,7 @@ public class SimpleSyntaxParser(
         if (_lexemeQueue.Peek().Kind == SyntaxKind.OpenBracketToken)
         {
             var openBracket = MatchToken(SyntaxKind.OpenBracketToken);
-            var number = ParseExpression();
+            var number = ParseNumberLiteral();
             var closeBracket = MatchToken(SyntaxKind.CloseBracketToken);
             return new ArrayTypeSyntax(type, openBracket, number, closeBracket);
         }
@@ -417,26 +416,27 @@ public class SimpleSyntaxParser(
         return new ParenthesizedExpressionSyntax(left, expression, right);
     }
 
-    private ExpressionSyntax ParseBooleanLiteral()
+    private LiteralExpressionSyntax<bool> ParseBooleanLiteral()
     {
         var isTrue = _lexemeQueue.Peek().Kind == SyntaxKind.TrueKeyword;
         var keywordToken = isTrue ? MatchToken(SyntaxKind.TrueKeyword) : MatchToken(SyntaxKind.FalseKeyword);
         return new LiteralExpressionSyntax<bool>(keywordToken, isTrue);
     }
-    private ExpressionSyntax ParseRealNumberLiteral()
+    private LiteralExpressionSyntax<double> ParseRealNumberLiteral()
     {
-        var token = MatchToken(SyntaxKind.NumberToken);
+        var token = MatchToken(SyntaxKind.RealNumberToken);
         var numberToken = token as Lexeme<double>;
         return new LiteralExpressionSyntax<double>(token, numberToken?.ParsedValue ?? 0.0d);
     }
 
-    private ExpressionSyntax ParseNumberLiteral()
+    private LiteralExpressionSyntax<long> ParseNumberLiteral()
     {
-        var numberToken = (MatchToken(SyntaxKind.NumberToken) as Lexeme<long>)!;
-        return new LiteralExpressionSyntax<long>(numberToken, numberToken.ParsedValue);
+        var token = MatchToken(SyntaxKind.NumberToken);
+        var numberToken = token as Lexeme<long>;
+        return new LiteralExpressionSyntax<long>(token, numberToken?.ParsedValue ?? 0);
     }
 
-    private ExpressionSyntax ParseStringLiteral()
+    private LiteralExpressionSyntax<string> ParseStringLiteral()
     {
         var token = MatchToken(SyntaxKind.StringToken);
         var stringToken = token as Lexeme<string>;

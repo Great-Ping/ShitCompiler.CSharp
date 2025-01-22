@@ -5,7 +5,7 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 public sealed record VariableDeclarationSyntax(
     Lexeme Keyword,
     Lexeme Identifier,
-    TypeClauseSyntax? TypeClause,
+    TypeClauseSyntax TypeClause,
     Lexeme EqualsToken,
     ExpressionSyntax Initializer,
     Lexeme SemicolonToken
