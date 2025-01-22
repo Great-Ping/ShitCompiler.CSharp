@@ -6,7 +6,7 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 public sealed record ArrayAssigmentExpressionSyntax(
     Lexeme Identifier,
     Lexeme OpenBracket,
-    ExpressionSyntax Expression,
+    LiteralExpressionSyntax<long> Number,
     Lexeme CloseBracket,
     Lexeme Operator,
     ExpressionSyntax Right
@@ -16,7 +16,7 @@ public sealed record ArrayAssigmentExpressionSyntax(
     {
         yield return Identifier;
         yield return OpenBracket;
-        yield return Expression;
+        yield return Number;
         yield return CloseBracket;
         yield return Operator;
         yield return Right;

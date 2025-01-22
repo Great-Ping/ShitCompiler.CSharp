@@ -96,9 +96,9 @@ public class SimpleSyntaxParser(
         return new ArrayExpressionSyntax(
             
             SyntaxKind.ArrayExpression,
-            MatchToken(SyntaxKind.OpenBracketToken),
-            ParseArguments(SyntaxKind.OpenBracketToken),
-            MatchToken(SyntaxKind.CloseBracketToken)
+            MatchToken(SyntaxKind.OpenBraceToken),
+            ParseArguments(SyntaxKind.CloseBraceToken),
+            MatchToken(SyntaxKind.CloseBraceToken)
         );
 
     }
@@ -145,7 +145,6 @@ public class SimpleSyntaxParser(
     private MemberSyntax ParseGlobalStatement()
     {
         return new GlobalStatementSyntax(
-            
             ParseStatement()
         );
     }
@@ -219,11 +218,13 @@ public class SimpleSyntaxParser(
 
         var typeClause = ParseTypeClause();
         var equals = MatchToken(SyntaxKind.EqualsToken);
-        var initializer = ParseBinaryExpression();
+        ExpressionSyntax initializer = typeClause.Type is ArrayTypeSyntax
+            ? ParseExpression()
+            : ParseBinaryExpression();
+        
         var semicolon = MatchToken(SyntaxKind.SemicolonToken);
 
         return new VariableDeclarationSyntax(
-            
             keyword,
             identifier,
             typeClause,
@@ -242,7 +243,6 @@ public class SimpleSyntaxParser(
         var coloToke = MatchToken(SyntaxKind.ColonToken);
 
         return new TypeClauseSyntax(
-            
             coloToke,
             ParseType()
         );
@@ -316,12 +316,11 @@ public class SimpleSyntaxParser(
             _lexemeQueue.Peek(1).Kind == SyntaxKind.OpenBracketToken)
             return ParseAssignmentExpression();
 
-        if (_lexemeQueue.Peek().Kind == SyntaxKind.OpenBracketToken)
+        if (_lexemeQueue.Peek().Kind == SyntaxKind.OpenBraceToken)
             return ParseArrayExpression();
 
         return ParseBinaryExpression();
     }
-
 
     private ExpressionSyntax ParseAssignmentExpression()
     {
@@ -331,12 +330,11 @@ public class SimpleSyntaxParser(
         if (_lexemeQueue.Peek().Kind == SyntaxKind.OpenBracketToken)
         {
             var openBracket = MatchToken(SyntaxKind.OpenBracketToken);
-            var expression = ParseBinaryExpression();
+            var expression = ParseNumberLiteral();
             var closeBracket = MatchToken(SyntaxKind.CloseBracketToken);
             operatorToken = MatchToken(SyntaxKind.EqualsToken);
-            right = ParseBinaryExpression();
+            right = ParseExpression();
             return new ArrayAssigmentExpressionSyntax(
-                
                 identifierToken,
                 openBracket,
                 expression,
