@@ -20,10 +20,15 @@ namespace ShitCompiler.CodeAnalysis.Semantics
     {
         SymbolTable _symbolTable = new();
         ISyntaxErrorsHandler errorsHandler = errorsHandler;
+
+
         Dictionary<SyntaxNode, TypeInfo> _dataTypes = new();
-       
+
+        Dictionary<string, FunctionSemantic> mFunctions = new();
+
         DataType _currentReturnDataType = DataType.Unknown;
         FunctionDeclarationSyntax _currentFunction;
+
         bool _hasFunctionReturn = false;
 
         public void Parse(CompilationUnitSyntax compilationUnit, bool createScopeInBlock=true) 
@@ -107,9 +112,53 @@ namespace ShitCompiler.CodeAnalysis.Semantics
             );
         }
 
-        private void HandleCallExpression(CallExpressionSyntax fuctionCall)
+        private void HandleCallExpression(CallExpressionSyntax call)
         {
-            CheckIdentifierDeclaration(fuctionCall, fuctionCall.Identifier);
+            CheckIdentifierDeclaration(call, call.Identifier);
+
+            DataType s = _dataTypes[call];
+            if (s == DataType.Unknown) {
+                return;
+            }
+
+            FunctionSemantic sem = mFunctions[call.Identifier.OriginalValue];
+
+            if (sem.Function.Parameters.Count < call.Arguments.Count) {
+                errorsHandler.Handle(
+                    new SemanticError(
+                        call.Start,
+                        $"A lot of parameters for function '{sem.Function.Identifier.OriginalValue}'({sem.Function.Parameters.Count})"
+                    )
+                );
+                return;
+            }
+
+            if (sem.Function.Parameters.Count > call.Arguments.Count) {
+                errorsHandler.Handle(
+                    new SemanticError(
+                        call.Start,
+                        $"Not enough parameters for function '{sem.Function.Identifier.OriginalValue}'({sem.Function.Parameters.Count})"
+                    )
+                );
+                return;
+            }
+
+            int i = 0;
+            foreach (ExpressionSyntax arg in call.Arguments) {
+                HandleSyntaxNode(arg);
+                DataType argType = _dataTypes[arg];
+                DataType funcArgType = sem.argTypes[i];
+                if (argType != funcArgType) {
+                    errorsHandler.Handle(
+                        new SemanticError(
+                            call.Start,
+                            $"Parameter type error for called function '{sem.Function.Identifier.OriginalValue}: Waited: {funcArgType}; Found: {argType}"
+                        )
+                    );
+                }
+
+                i++;
+            }
         }
 
         private void HandleIfStatement(IfStatementSyntax ifStatement)
@@ -279,9 +328,13 @@ namespace ShitCompiler.CodeAnalysis.Semantics
 
             _symbolTable.CreateNewSymbolBlock();
 
+            List<DataType> argParams = new List<DataType>();
+
             foreach (ParameterSyntax param in funk.Parameters) 
             {
                 Declarate(param.Identifier, param.TypeClause);
+                DataType type = _dataTypes[param.Identifier];
+                argParams.Add(type);
             }
 
             Symbol? funcType = _symbolTable.Find(
@@ -301,6 +354,16 @@ namespace ShitCompiler.CodeAnalysis.Semantics
             _currentFunction = funk;
             _currentReturnDataType = funcType.DataType;
             _hasFunctionReturn = false;
+
+            mFunctions.Add(
+                funk.Identifier.OriginalValue,
+                new FunctionSemantic(
+                    funcType.DataType,
+                    funk,
+                    argParams
+                )
+            );
+
             HandleSyntaxNode(funk.Block, false);
 
             if (!_hasFunctionReturn && funcType.DataType != DataType.Unit) {
