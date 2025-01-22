@@ -85,10 +85,22 @@ namespace ShitCompiler.CodeAnalysis.Semantics
                 case ReturnStatementSyntax returnState:
                     HandleReturnExpression(returnState);
                     break;
+                case ParenthesizedExpressionSyntax parenthesizedExpression:
+                    HandleParenthesizedExpression(parenthesizedExpression); 
+                    break;
                 default:
                     HandleSyntaxNodes(node.GetChildren());
                     break;
             };
+        }
+
+        private void HandleParenthesizedExpression(ParenthesizedExpressionSyntax parenthesizedExpression)
+        {
+            HandleSyntaxNode(parenthesizedExpression.Expression);
+            _dataTypes.Add(
+                parenthesizedExpression,
+                _dataTypes.GetValueOrDefault(parenthesizedExpression.Expression, DataType.Unknown)
+            );
         }
 
         private void HandleIndexExpression(IndexExpressionSyntax indexExpression)
@@ -208,11 +220,11 @@ namespace ShitCompiler.CodeAnalysis.Semantics
         }
 
         private void HandleIfStatementCondition(ExpressionSyntax condition)
-        {
+        { 
             HandleSyntaxNode(condition);
             TypeInfo conditionType = _dataTypes.GetValueOrDefault(condition, DataType.Unknown);
 
-            if (conditionType != DataType.Boolean){
+            if (conditionType.Type != DataType.Boolean || conditionType.ArraySize.Any()){
                 errorsHandler.Handle(
                     new SemanticError(
                         condition.Start,
