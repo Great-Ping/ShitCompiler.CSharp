@@ -31,8 +31,7 @@ public class SimpleLexer: ILexer
                     _textCursor.Reset(startingPosition);
                     //Игнорируются только правильные комментарии,
                     //если в комментарии ошибка, то она всплывает
-                    SkipComment();
-                    return ScanNext();
+                    return SkipComment()??ScanNext();
                 }
                 kind = SyntaxKind.SlashToken;
                 break;
