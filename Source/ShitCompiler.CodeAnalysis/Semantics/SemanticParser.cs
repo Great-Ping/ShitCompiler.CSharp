@@ -22,6 +22,10 @@ namespace ShitCompiler.CodeAnalysis.Semantics
         ISyntaxErrorsHandler errorsHandler = errorsHandler;
         Dictionary<SyntaxNode, DataType> _dataTypes = new();
 
+        DataType _currentReturnDataType = DataType.Unknown;
+        FunctionDeclarationSyntax _currentFunction;
+
+        bool _hasFunctionReturn = false;
 
         public void Parse(CompilationUnitSyntax compilationUnit, bool createScopeInBlock=true) 
         {
@@ -64,6 +68,9 @@ namespace ShitCompiler.CodeAnalysis.Semantics
                     break;
                 case CallExpressionSyntax fuctionCall:
                     HandleCallExpression(fuctionCall);
+                    break;
+                case ReturnStatementSyntax returnState:
+                    HandleReturnExpression(returnState);
                     break;
                 default:
                     HandleSyntaxNodes(node.GetChildren());
@@ -248,7 +255,34 @@ namespace ShitCompiler.CodeAnalysis.Semantics
                 Declarate(param.Identifier, param.TypeClause);
             }
 
+            Symbol? funcType = _symbolTable.Find(
+                funk.Identifier
+            );
+
+            if (funcType == null) {
+                errorsHandler.Handle(
+                    new SemanticError(
+                        funk.Identifier.Start,
+                        $"No function data type - {funk.Identifier.OriginalValue}"
+                    )
+                );
+                return;
+            }
+
+            _currentFunction = funk;
+            _currentReturnDataType = funcType.DataType;
+            _hasFunctionReturn = false;
             HandleSyntaxNode(funk.Block, false);
+
+            if (!_hasFunctionReturn && funcType.DataType != DataType.Unit) {
+                errorsHandler.Handle(
+                    new SemanticError(
+                        funk.Identifier.Start,
+                        $"No function return statement for {funk.Identifier.OriginalValue}"
+                    )
+                );
+            }
+
             _symbolTable.DismissBlock();
         }
         
@@ -267,8 +301,7 @@ namespace ShitCompiler.CodeAnalysis.Semantics
 
         private void HandleNameExpression(
             NameExpressionSyntax name
-        ) 
-        {
+        ) {
             CheckIdentifierDeclaration(name, name.Identifier);
         }
 
@@ -299,5 +332,43 @@ namespace ShitCompiler.CodeAnalysis.Semantics
                 literal.Type
             );
         }
+
+        private void HandleReturnExpression(
+            ReturnStatementSyntax ret
+        ) {
+            _hasFunctionReturn = true;
+            if (_currentReturnDataType == DataType.Unit) {
+                return;
+            }
+
+            if (ret.Expression == null) {
+                errorsHandler.Handle(
+                    new SemanticError(
+                        _currentFunction.Identifier.Start,
+                        $"Function {_currentFunction.Identifier.OriginalValue} should return value with data type {_currentReturnDataType}"
+                    )
+                );
+                return;
+            }
+
+            HandleSyntaxNode(
+                ret.Expression,
+                false
+            );
+
+            DataType retType = _dataTypes[ret.Expression];
+            if (retType == _currentReturnDataType) {
+                return;
+            }
+
+            errorsHandler.Handle(
+                new SemanticError(
+                    _currentFunction.Identifier.Start,
+                    $"Function: {_currentFunction.Identifier.OriginalValue} has invalid return value: {retType}. Waited: {_currentReturnDataType}"
+                )
+            );
+
+        }
+
     }
 }
