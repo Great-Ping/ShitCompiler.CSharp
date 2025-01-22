@@ -46,7 +46,7 @@ namespace ShitCompiler.CodeAnalysis.Semantics
 
         public void AddSymbol(Symbol lexeme)
         {
-            Symbols.Add(lexeme.Name, lexeme);
+            Symbols.TryAdd(lexeme.Name, lexeme);
         }
 
         public SymbolScope CreateChild()

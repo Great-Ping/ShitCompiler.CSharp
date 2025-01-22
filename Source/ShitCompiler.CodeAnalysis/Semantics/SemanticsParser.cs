@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,42 +19,20 @@ namespace ShitCompiler.CodeAnalysis.Semantics
         Dictionary<SyntaxNode, DataType> _dataTypes = new();
 
 
-        public void Parse(CompilationUnitSyntax compilationUnit) 
+        public void Parse(CompilationUnitSyntax compilationUnit, bool createScopeInBlock=true) 
         {
             _symbolTable.ResetBlock();
-            ParsePrivate(compilationUnit);
+            HandleSyntaxNode(compilationUnit, createScopeInBlock);
+        }
+        private void HandleSyntaxNodes(params IEnumerable<ISyntaxNode> nodes)
+        {
+            foreach(ISyntaxNode node in nodes)
+                HandleSyntaxNode(node);
         }
 
-        private void ParsePrivate(SyntaxNode node) 
+        private void HandleSyntaxNode(ISyntaxNode node, bool createScopeInBlock=true)
         {
-            bool blockIsCreated = TryCreateSymbolBlock(node);
-            Handle(node);
-
-            foreach (SyntaxNode child in node.GetChildren()) 
-            {
-                ParsePrivate(child);
-            }
-
-            if (blockIsCreated)
-                _symbolTable.DismissBlock();
-        }
-
-        private bool TryCreateSymbolBlock(SyntaxNode node) 
-        {
-            switch (node)
-            {
-                case BlockStatementSyntax:
-                case FunctionDeclarationSyntax:
-                    _symbolTable.CreateNewSymbolBlock();
-                    return true;
-            }
-
-            return false;
-        }
-
-        private void Handle(SyntaxNode node)
-        {
-            switch (node)
+             switch (node)
             {
                 case LiteralExpressionSyntax literal:
                     HandleLiteralExpression(literal);
@@ -75,8 +55,48 @@ namespace ShitCompiler.CodeAnalysis.Semantics
                 case IfStatementSyntax ifStatement:
                     HandleIfStatement(ifStatement);
                     break;
+                case BlockStatementSyntax block:
+                    HandleBlockStatement(block, createScope: createScopeInBlock);
+                    break;
+                default:
+                    HandleSyntaxNodes(node.GetChildren());
+                    break;
             }
         }
+
+        private void HandleIfStatement(IfStatementSyntax ifStatement)
+        {
+            _symbolTable.CreateNewSymbolBlock();
+            HandleIfstatementCondition(ifStatement.Condition);
+            HandleSyntaxNode(ifStatement.ThenStatement, false);
+            _symbolTable.DismissBlock();
+
+            if (ifStatement.ElseClause == null)
+                return;
+
+            _symbolTable.CreateNewSymbolBlock();
+            HandleSyntaxNode(ifStatement.ElseClause.ElseStatement, false);
+            _symbolTable.DismissBlock();
+        }
+
+        private void HandleIfstatementCondition(ExpressionSyntax condition)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void HandleBlockStatement(BlockStatementSyntax block, bool createScope = false)
+        {
+            if (!createScope)
+            {
+                HandleSyntaxNodes(block.GetChildren());
+                return;
+            }
+
+            _symbolTable.CreateNewSymbolBlock();
+            HandleSyntaxNodes(block.GetChildren());
+            _symbolTable.DismissBlock();
+        }
+
 
 
         private void HandleAssigmentExpresssion(AssignmentExpressionSyntax assignmentExpression)
@@ -97,11 +117,6 @@ namespace ShitCompiler.CodeAnalysis.Semantics
                 );
                 return;
             }
-        }
-
-        private void HandleIfStatement(IfStatementSyntax ifStatement)
-        {
-            // throw new NotImplementedException();
         }
 
         private void HandleVariable(VariableDeclarationSyntax variable)
@@ -185,6 +200,8 @@ namespace ShitCompiler.CodeAnalysis.Semantics
         {
             HandleDeclaration(funk.Identifier, funk.TypeClause, true);
 
+            _symbolTable.CreateNewSymbolBlock();
+            
             foreach (ParameterSyntax param in funk.Parameters) {
                 HandleDeclaration(param.Identifier, param.TypeClause);
                 _symbolTable.AddSymbol(
@@ -194,6 +211,9 @@ namespace ShitCompiler.CodeAnalysis.Semantics
                     )
                 );
             }
+
+            HandleSyntaxNode(funk.Block, false);
+            _symbolTable.DismissBlock();
         }
 
         private void HandleBinaryExpression(BinaryExpressionSyntax binaryExpression)
