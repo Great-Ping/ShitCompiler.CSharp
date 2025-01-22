@@ -81,6 +81,7 @@ namespace ShitCompiler.CodeAnalysis.Semantics
 
         private void HandleIfstatementCondition(ExpressionSyntax condition)
         {
+            
             throw new NotImplementedException();
         }
 
@@ -121,11 +122,12 @@ namespace ShitCompiler.CodeAnalysis.Semantics
 
         private void HandleVariable(VariableDeclarationSyntax variable)
         {
-            HandleDeclaration(variable.Identifier, variable.TypeClause);
+            Declarate(variable.Identifier, variable.TypeClause);
+            ///TODO TYPE MATCHING
         }
 
         //Обрабатывает объявление какого либо идентификатора в текущем Scope
-        private void HandleDeclaration(Lexeme identifier, TypeClauseSyntax typeClause, bool isFunk=false)
+        private void Declarate(Lexeme identifier, TypeClauseSyntax typeClause, bool isFunk=false)
         {
             Symbol? symbol = _symbolTable.FindInBlock(identifier);
             if (symbol == null) 
@@ -193,17 +195,17 @@ namespace ShitCompiler.CodeAnalysis.Semantics
 
         private void HandleArrayExpression(ArrayExpressionSyntax array)
         {
-            // throw new NotImplementedException();
+            
         }
 
         private void HandleFunctionDeclaration(FunctionDeclarationSyntax funk)
         {
-            HandleDeclaration(funk.Identifier, funk.TypeClause, true);
+            Declarate(funk.Identifier, funk.TypeClause, true);
 
             _symbolTable.CreateNewSymbolBlock();
-            
+
             foreach (ParameterSyntax param in funk.Parameters) {
-                HandleDeclaration(param.Identifier, param.TypeClause);
+                Declarate(param.Identifier, param.TypeClause);
                 _symbolTable.AddSymbol(
                     new Symbol(
                         param.Identifier,
