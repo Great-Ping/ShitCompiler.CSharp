@@ -468,7 +468,7 @@ public class SimpleSyntaxParser(
     {
         var identifier = MatchToken(SyntaxKind.IdentifierToken);
         var openParenthesisToken = MatchToken(SyntaxKind.OpenBracketToken);
-        var arguments = ParseArguments(SyntaxKind.CloseBracketToken);
+        var arguments = ParseNumberLiteral();
         var closeParenthesisToken = MatchToken(SyntaxKind.CloseBracketToken);
         return new IndexExpressionSyntax(identifier, openParenthesisToken, arguments, closeParenthesisToken);
     }

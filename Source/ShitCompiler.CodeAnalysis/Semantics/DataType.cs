@@ -1,5 +1,6 @@
 namespace ShitCompiler.CodeAnalysis.Semantics;
 
+[Flags]
 public enum DataType
 {
     Unknown   = 0b000000000,

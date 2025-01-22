@@ -5,7 +5,7 @@ public class TypeInfo(
     int[] arraySize
 )
 {
-    public DataType Type => type;
+    public DataType Type { get; set; } = type;
     public int[] ArraySize => arraySize;
     
     public virtual bool Equals(TypeInfo? other)
@@ -18,14 +18,8 @@ public class TypeInfo(
         
         if (ArraySize.Length != other.ArraySize.Length)
             return false;
-    
-        for (int i = 0; i < ArraySize.Length; i++)
-        {   
-            if (ArraySize[i] != other.ArraySize[i])
-                return false;
-        }
-        
-        return true;
+
+        return !ArraySize.Where((t, i) => t != other.ArraySize[i]).Any();
     }
     
     public override int GetHashCode()

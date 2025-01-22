@@ -47,6 +47,12 @@ namespace ShitCompiler.CodeAnalysis.Semantics
                 case ArrayExpressionSyntax arrayExpression:
                     HandleArrayExpression(arrayExpression);
                     break;
+                case IndexExpressionSyntax indexExpression:
+                    HandleIndexExpression(indexExpression);
+                    break;
+                case ArrayAssigmentExpressionSyntax arrayAssigmentExpression:
+                    HandleArrayAssigment(arrayAssigmentExpression);
+                    break;
                 case LiteralExpressionSyntax literal:
                     HandleLiteralExpression(literal);
                     break;
@@ -78,6 +84,31 @@ namespace ShitCompiler.CodeAnalysis.Semantics
                     HandleSyntaxNodes(node.GetChildren());
                     break;
             };
+        }
+
+        private void HandleIndexExpression(IndexExpressionSyntax indexExpression)
+        {
+            HandleIdentifier(indexExpression.Identifier);
+            
+            TypeInfo type = _dataTypes.GetValueOrDefault(indexExpression.Identifier, DataType.Unknown);
+            if (type.ArraySize.FirstOrDefault() <= indexExpression.Number.Value)
+                errorsHandler.Handle(new SemanticError(indexExpression.Start, "Index out of range"));
+
+            _dataTypes[indexExpression] = type.Type &(~DataType.Array);
+        }
+
+        private void HandleArrayAssigment(ArrayAssigmentExpressionSyntax arrayAssigment)
+        {
+            HandleIdentifier(arrayAssigment.Identifier);
+            HandleSyntaxNode(arrayAssigment.Right);
+            
+            TypeInfo type = _dataTypes.GetValueOrDefault(arrayAssigment.Identifier, DataType.Unknown);
+            if (type.ArraySize.FirstOrDefault() <= arrayAssigment.Number.Value)
+                errorsHandler.Handle(new SemanticError(arrayAssigment.Start, "Index out of range"));
+            
+            //Костыли, как мы любим
+            _dataTypes[arrayAssigment.Identifier] = type.Type & (~DataType.Array);
+            PromoteType(arrayAssigment, arrayAssigment.Identifier, arrayAssigment.Right);
         }
 
         private void HandleArrayExpression(ArrayExpressionSyntax arrayExpression)
@@ -155,26 +186,32 @@ namespace ShitCompiler.CodeAnalysis.Semantics
             _symbolTable.DismissBlock();
         }
 
-
-
-        private void HandleAssigmentExpresssion(AssignmentExpressionSyntax assignmentExpression)
+        private void HandleAssigmentExpresssion(AssignmentExpressionSyntax assignment)
         {
-            Lexeme leftId = assignmentExpression.Identifier;
+            Lexeme leftId = assignment.Identifier;
             HandleIdentifier(leftId);
+            HandleSyntaxNode(assignment.Right);
+            PromoteType(assignment, assignment.Identifier, assignment.Right);
         }
 
         private void HandleIdentifier(Lexeme identifier) 
         {
             Symbol? symbol = _symbolTable.Find(identifier);
-            if (symbol == null) {
-                errorsHandler.Handle(
-                    new SemanticError(
-                        identifier.Start,
-                        $"AssignmentExpression: No data type for ID - {identifier.OriginalValue}"
-                    )
+            if (symbol != null) {
+                _dataTypes.Add(
+                    identifier,
+                    new TypeInfo(symbol.DataType, symbol.ArraySize)
                 );
                 return;
             }
+            
+            errorsHandler.Handle(
+                new SemanticError(
+                    identifier.Start,
+                    $"AssignmentExpression: No data type for ID - {identifier.OriginalValue}"
+                )
+            );
+            
         }
 
         private void HandleVariable(VariableDeclarationSyntax variable)
