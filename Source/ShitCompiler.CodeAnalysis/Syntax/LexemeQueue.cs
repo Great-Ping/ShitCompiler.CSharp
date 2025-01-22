@@ -6,19 +6,19 @@ namespace ShitCompiler.CodeAnalysis.Syntax;
 public class LexemeQueue(ILexer lexer)
 {
     private int _currentIndex = 0;
-    private readonly List<Lexicon.Lexeme> _queue = new();
+    private readonly List<Lexeme> _queue = new();
     private readonly ILexer _lexer = lexer;
     public int CurrentIndex => _currentIndex;
 
 
-    private Lexicon.Lexeme ScanAndSave()
+    private Lexeme ScanAndSave()
     {
-        Lexicon.Lexeme result = _lexer.ScanNext();
+        Lexeme result = _lexer.ScanNext();
         _queue.Add(result);
         return result;
     }
     
-    public Lexicon.Lexeme Peek(int index = 0)
+    public Lexeme Peek(int index = 0)
     {
         for (int i = _currentIndex + index; i >= _queue.Count; i--)
             ScanAndSave();
@@ -27,7 +27,7 @@ public class LexemeQueue(ILexer lexer)
     }
 
     
-    public Lexicon.Lexeme Next()
+    public Lexeme Next()
     {
         _currentIndex++;
 

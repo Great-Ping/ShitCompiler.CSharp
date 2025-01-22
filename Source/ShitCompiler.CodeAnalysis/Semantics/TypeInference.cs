@@ -8,7 +8,9 @@ public class TypeInference(ISyntaxErrorsHandler errrorHandler)
     public const string DataTypeKey = "DataType";
     public const string ItemTypeKey = "ItemType";
     public const string ArraySizeKey = "ArraySize";
-    
+
+    private SymbolTable _symbolTable = new SymbolTable();
+
     public void Handle(SyntaxNode node)
     {
         switch(node)
@@ -39,7 +41,7 @@ public class TypeInference(ISyntaxErrorsHandler errrorHandler)
 
     private void HandleAssigmentExpresssion(AssignmentExpressionSyntax assignmentExpression)
     {
-        throw new NotImplementedException();
+        
     }
 
     private void HandleIfStatement(IfStatementSyntax ifStatement)
@@ -69,26 +71,6 @@ public class TypeInference(ISyntaxErrorsHandler errrorHandler)
 
     private void HandleLiteralExpression(LiteralExpressionSyntax literal)
     {
-        switch (literal)
-        {
-            case LiteralExpressionSyntax<long>:
-                literal.Metadata[DataTypeKey] = DataType.Long;
-                break;
-            case LiteralExpressionSyntax<double>:
-                literal.Metadata[DataTypeKey] = DataType.Double;
-                break;
-            case LiteralExpressionSyntax<Char>:
-                literal.Metadata[DataTypeKey] = DataType.Char;
-                break;
-            case LiteralExpressionSyntax<String>:
-                literal.Metadata[DataTypeKey] = DataType.String;
-                break;
-            case LiteralExpressionSyntax<bool>:
-                literal.Metadata[DataTypeKey] = DataType.Boolean;
-                break;
-            default:
-                literal.Metadata[DataTypeKey] = DataType.Unknown;
-                break;
-        }
+       
     }
 }

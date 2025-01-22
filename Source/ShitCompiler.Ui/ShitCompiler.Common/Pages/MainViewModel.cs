@@ -30,8 +30,7 @@ public partial class MainViewModel : ViewModelBase
         List<ParseError> errors = new();
         
         SimpleSyntaxParser parser = new SimpleSyntaxParser(
-            lexems, 
-            new SymbolTable(), 
+            lexems,
             new AccumulatingErrorsHandler(errors)
         );
         

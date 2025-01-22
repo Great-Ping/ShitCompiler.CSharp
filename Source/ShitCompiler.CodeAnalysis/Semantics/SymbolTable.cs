@@ -99,7 +99,7 @@ public class SymbolTable
         return _current.Find(identifier, location);
     }
 
-    public Lexeme? Find(Lexicon.Lexeme lexeme)
+    public Lexeme? Find(Lexeme lexeme)
     {
         if (lexeme.Kind != SyntaxKind.IdentifierToken)
             return null;

@@ -4,14 +4,13 @@ namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 
 public sealed record ArrayAssigmentExpressionSyntax(
-    SymbolBlock SymbolBlock,
-    Lexicon.Lexeme Identifier,
-    Lexicon.Lexeme OpenBracket,
+    Lexeme Identifier,
+    Lexeme OpenBracket,
     ExpressionSyntax Expression,
-    Lexicon.Lexeme CloseBracket,
-    Lexicon.Lexeme Operator,
+    Lexeme CloseBracket,
+    Lexeme Operator,
     ExpressionSyntax Right
-) : ExpressionSyntax(SymbolBlock, SyntaxKind.ArrayAssigmentExpression)
+) : ExpressionSyntax(SyntaxKind.ArrayAssigmentExpression)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()
     {
@@ -25,11 +24,10 @@ public sealed record ArrayAssigmentExpressionSyntax(
 }
 
 public sealed record AssignmentExpressionSyntax(
-    SymbolBlock SymbolBlock,
-    Lexicon.Lexeme Identifier,
-    Lexicon.Lexeme Operator,
+    Lexeme Identifier,
+    Lexeme Operator,
     ExpressionSyntax Right
-) : ExpressionSyntax(SymbolBlock, SyntaxKind.AssignmentExpression)
+) : ExpressionSyntax(SyntaxKind.AssignmentExpression)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()
     {

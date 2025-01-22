@@ -27,12 +27,12 @@ public sealed class SeparatedSyntaxList<T> : SeparatedSyntaxList, IEnumerable<T>
 
     public T this[int index] => (T) _nodesAndSeparators[index * 2];
 
-    public Lexicon.Lexeme GetSeparator(int index)
+    public Lexeme GetSeparator(int index)
     {
         if (index < 0 || index >= Count - 1)
             throw new ArgumentOutOfRangeException(nameof(index));
 
-        return (_nodesAndSeparators[index * 2 + 1] as Lexicon.Lexeme)!;
+        return (_nodesAndSeparators[index * 2 + 1] as Lexeme)!;
     }
 
     public override ImmutableArray<SyntaxNode> GetWithSeparators() => _nodesAndSeparators;

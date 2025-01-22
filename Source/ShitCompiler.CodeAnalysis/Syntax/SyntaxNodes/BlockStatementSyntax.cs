@@ -4,11 +4,10 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record BlockStatementSyntax(
-    SymbolBlock SymbolBlock,
-    Lexicon.Lexeme OpenBraceToken,
+    Lexeme OpenBraceToken,
     ImmutableArray<StatementSyntax> Statements,
-    Lexicon.Lexeme CloseBraceToken
-) : StatementSyntax(SymbolBlock, SyntaxKind.BlockStatement)
+    Lexeme CloseBraceToken
+) : StatementSyntax(SyntaxKind.BlockStatement)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()
     {

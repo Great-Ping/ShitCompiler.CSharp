@@ -4,9 +4,8 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 using ShitCompiler.CodeAnalysis.Syntax;
 
 public sealed record IdentifierTypeSyntax(
-    SymbolBlock SymbolBlock,
-    Lexicon.Lexeme Identifier
-) : TypeSyntax(SymbolBlock, SyntaxKind.IdentifierTypeSyntax)
+    Lexeme Identifier
+) : TypeSyntax(SyntaxKind.IdentifierTypeSyntax)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()
     {
@@ -16,12 +15,11 @@ public sealed record IdentifierTypeSyntax(
 
 
 public sealed record ArrayTypeSyntax(
-    SymbolBlock SymbolBlock,
-    Lexicon.Lexeme Identifier,
-    Lexicon.Lexeme OpenBracket,
+    Lexeme Identifier,
+    Lexeme OpenBracket,
     ExpressionSyntax ArraySizeNumber,
-    Lexicon.Lexeme CloseBracket
-) : TypeSyntax(SymbolBlock, SyntaxKind.ArrayTypeSyntax)
+    Lexeme CloseBracket
+) : TypeSyntax(SyntaxKind.ArrayTypeSyntax)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()
     {
@@ -36,14 +34,12 @@ public sealed record ArrayTypeSyntax(
 }
 
 public abstract record TypeSyntax(
-    SymbolBlock SymbolBlock,
     SyntaxKind Kind
 ) : SyntaxNode(Kind);
 
 
 public sealed record TypeClauseSyntax(
-    SymbolBlock SymbolBlock,
-    Lexicon.Lexeme ColonToken,
+    Lexeme ColonToken,
     TypeSyntax Type
 ) : SyntaxNode(SyntaxKind.TypeClause) {
 

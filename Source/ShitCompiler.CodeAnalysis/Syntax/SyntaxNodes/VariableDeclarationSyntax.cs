@@ -3,15 +3,13 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record VariableDeclarationSyntax(
-    SymbolBlock SymbolBlock,
-    Lexicon.Lexeme Keyword,
-    Lexicon.Lexeme Identifier,
+    Lexeme Keyword,
+    Lexeme Identifier,
     TypeClauseSyntax? TypeClause,
-    Lexicon.Lexeme EqualsToken,
+    Lexeme EqualsToken,
     ExpressionSyntax Initializer,
-    Lexicon.Lexeme SemicolonToken
+    Lexeme SemicolonToken
 ): StatementSyntax(
-    SymbolBlock,
     SyntaxKind.VariableDeclaration
 ) {
 

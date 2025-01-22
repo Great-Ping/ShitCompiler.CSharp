@@ -4,26 +4,21 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 public sealed record CompilationUnitSyntax(
-    SymbolBlock Block,
     ImmutableArray<MemberSyntax> Members,
-    Lexicon.Lexeme EndOfFileToken
+    Lexeme EndOfFileToken
 ) : SyntaxNode(SyntaxKind.CompilationUnit)
 {
     public static CompilationUnitSyntax Empty { get; } = new(
-        new SymbolBlock(
-            null,
-            ImmutableDictionary<string, Lexeme>.Empty
-        ),
         ImmutableArray<MemberSyntax>.Empty,
-        new Lexicon.Lexeme(SyntaxKind.EndToken, String.Empty, Location.Zero)
+        new Lexeme(SyntaxKind.EndToken, String.Empty, Location.Zero)
     );
 
     public override IEnumerable<ISyntaxNode> GetChildren()
         => Members;
 
-    public IEnumerable<Lexicon.Lexeme> GetLexemes()
+    public IEnumerable<Lexeme> GetLexemes()
     {
-        List<Lexicon.Lexeme> lexemes = new List<Lexicon.Lexeme>();
+        List<Lexeme> lexemes = new List<Lexeme>();
         List<ISyntaxNode> syntaxNodes = GetChildren().ToList();
 
         while (syntaxNodes.Count > 0)
@@ -31,7 +26,7 @@ public sealed record CompilationUnitSyntax(
             ISyntaxNode node = syntaxNodes.First();
             syntaxNodes.RemoveAt(0);
 
-            if (node is Lexicon.Lexeme lexeme)
+            if (node is Lexeme lexeme)
             {
                 lexemes.Add(lexeme);
                 continue;

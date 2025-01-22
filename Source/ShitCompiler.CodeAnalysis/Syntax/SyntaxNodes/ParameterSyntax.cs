@@ -3,11 +3,9 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record ParameterSyntax(
-    SymbolBlock SymbolBlock,
-    Lexicon.Lexeme Identifier,
+    Lexeme Identifier,
     TypeClauseSyntax Type
 ): MemberSyntax(
-    SymbolBlock,
     SyntaxKind.ColonToken
 ) {
 

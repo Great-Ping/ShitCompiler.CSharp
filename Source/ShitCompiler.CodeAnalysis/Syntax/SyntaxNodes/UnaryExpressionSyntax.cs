@@ -4,10 +4,9 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record UnaryExpressionSyntax(
-    SymbolBlock SymbolBlock,
-    Lexicon.Lexeme Operator,
+    Lexeme Operator,
     ExpressionSyntax Operand
-) : ExpressionSyntax(SymbolBlock, SyntaxKind.UnaryExpression)
+) : ExpressionSyntax(SyntaxKind.UnaryExpression)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()
     {

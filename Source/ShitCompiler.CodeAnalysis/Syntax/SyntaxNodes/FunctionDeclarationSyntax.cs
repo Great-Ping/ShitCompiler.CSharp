@@ -5,15 +5,14 @@ using System.Text;
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record FunctionDeclarationSyntax(
-    SymbolBlock SymbolBlock,
-    Lexicon.Lexeme Funk,
-    Lexicon.Lexeme Identifier,
-    Lexicon.Lexeme OpenParenthesisToken,
+    Lexeme Funk,
+    Lexeme Identifier,
+    Lexeme OpenParenthesisToken,
     SeparatedSyntaxList<ParameterSyntax> Parameters,
-    Lexicon.Lexeme CloseParenthesisToken,
+    Lexeme CloseParenthesisToken,
     TypeClauseSyntax Type,
     BlockStatementSyntax Block
-): MemberSyntax(SymbolBlock, SyntaxKind.FunctionDeclaration) {
+): MemberSyntax(SyntaxKind.FunctionDeclaration) {
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {

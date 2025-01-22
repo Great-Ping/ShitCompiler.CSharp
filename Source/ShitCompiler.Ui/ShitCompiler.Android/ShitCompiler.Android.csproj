@@ -10,8 +10,9 @@
         <AndroidPackageFormat>apk</AndroidPackageFormat>
         <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
         <RootNamespace>ShitCompiler.Android</RootNamespace>
+        <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
-
+    
     <ItemGroup>
         <AndroidResource Include="Icon.png">
             <Link>Resources\drawable\Icon.png</Link>

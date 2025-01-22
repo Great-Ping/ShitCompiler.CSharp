@@ -1,0 +1,11 @@
+﻿<Solution>
+  <Folder Name="/ShitCompiler.Ui/">
+    <Project Path="Source\ShitCompiler.Ui\ShitCompiler.Android\ShitCompiler.Android.csproj" Type="Classic C#">
+      <Configuration Solution="Debug|Any CPU" Project="Debug|Any CPU|Deploy" />
+    </Project>
+    <Project Path="Source\ShitCompiler.Ui\ShitCompiler.Browser\ShitCompiler.Browser.csproj" Type="Classic C#" />
+    <Project Path="Source\ShitCompiler.Ui\ShitCompiler.Common\ShitCompiler.Common.csproj" Type="Classic C#" />
+    <Project Path="Source\ShitCompiler.Ui\ShitCompiler.Desktop\ShitCompiler.Desktop.csproj" Type="Classic C#" />
+  </Folder>
+  <Project Path="Source\ShitCompiler.CodeAnalysis\ShitCompiler.CodeAnalysis.csproj" Type="Classic C#" />
+</Solution>

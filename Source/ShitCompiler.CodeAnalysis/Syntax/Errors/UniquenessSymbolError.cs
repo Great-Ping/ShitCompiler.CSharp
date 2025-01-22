@@ -7,7 +7,7 @@ class UniquenessSymbolError(
     string? message
 ) : ParseError(location, message)
 {
-    public UniquenessSymbolError(Lexicon.Lexeme identifier) 
+    public UniquenessSymbolError(Lexeme identifier) 
         : this(identifier.Start, $"Not unique identifier {identifier.OriginalValue}")
     { }
 }

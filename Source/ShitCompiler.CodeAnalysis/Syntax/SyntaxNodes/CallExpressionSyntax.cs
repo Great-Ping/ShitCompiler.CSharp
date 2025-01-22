@@ -3,12 +3,11 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public record CallExpressionSyntax(
-    SymbolBlock SymbolBlock,
-    Lexicon.Lexeme Identifier,
-    Lexicon.Lexeme OpenParenthesisToken,
+    Lexeme Identifier,
+    Lexeme OpenParenthesisToken,
     SeparatedSyntaxList<ExpressionSyntax> Arguments,
-    Lexicon.Lexeme CloseParenthesisToken
-) : ExpressionSyntax(SymbolBlock, SyntaxKind.CallExpression)
+    Lexeme CloseParenthesisToken
+) : ExpressionSyntax(SyntaxKind.CallExpression)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()
     {

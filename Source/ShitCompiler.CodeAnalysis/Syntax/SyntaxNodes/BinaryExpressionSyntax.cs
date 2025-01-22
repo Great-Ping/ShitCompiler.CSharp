@@ -3,11 +3,10 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public record BinaryExpressionSyntax(
-    SymbolBlock SymbolBlock, 
     ExpressionSyntax Left,
-    Lexicon.Lexeme Operand,
+    Lexeme Operand,
     ExpressionSyntax Right
-) : ExpressionSyntax(SymbolBlock, SyntaxKind.BinaryExpression) {
+) : ExpressionSyntax(SyntaxKind.BinaryExpression) {
     public override IEnumerable<ISyntaxNode> GetChildren()
     {
         return

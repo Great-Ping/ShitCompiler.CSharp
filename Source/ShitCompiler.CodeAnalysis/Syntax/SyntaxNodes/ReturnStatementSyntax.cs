@@ -3,11 +3,10 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 namespace ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public sealed record ReturnStatementSyntax(
-    SymbolBlock SymbolBlock,
-    Lexicon.Lexeme Keyword,
+    Lexeme Keyword,
     ExpressionSyntax? Expression,
-    Lexicon.Lexeme Semicolon
-) : StatementSyntax(SymbolBlock, SyntaxKind.ReturnStatement)
+    Lexeme Semicolon
+) : StatementSyntax(SyntaxKind.ReturnStatement)
 {
     public override IEnumerable<ISyntaxNode> GetChildren()
     {

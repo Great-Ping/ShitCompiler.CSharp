@@ -7,7 +7,7 @@ public class ExpectedTypeError(
     string? message
 ) : ParseError(location, message)
 {
-    public ExpectedTypeError(Lexicon.Lexeme lexeme)
+    public ExpectedTypeError(Lexeme lexeme)
         : this(lexeme.Start, $"Expected Type, but found {lexeme.Kind}")
     { }
 }
