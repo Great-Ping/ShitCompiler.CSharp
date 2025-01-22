@@ -243,14 +243,9 @@ namespace ShitCompiler.CodeAnalysis.Semantics
 
             _symbolTable.CreateNewSymbolBlock();
 
-            foreach (ParameterSyntax param in funk.Parameters) {
+            foreach (ParameterSyntax param in funk.Parameters) 
+            {
                 Declarate(param.Identifier, param.TypeClause);
-                _symbolTable.AddSymbol(
-                    new Symbol(
-                        param.Identifier,
-                        ParseType(param.TypeClause.Type)
-                    )
-                );
             }
 
             HandleSyntaxNode(funk.Block, false);
