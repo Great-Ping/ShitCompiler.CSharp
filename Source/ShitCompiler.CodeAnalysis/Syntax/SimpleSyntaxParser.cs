@@ -18,6 +18,8 @@ public class SimpleSyntaxParser(
     private readonly LexemeQueue _lexemeQueue = lexemeQueue;
     private readonly ISyntaxErrorsHandler _errorsHandler = errorsHandler;
 
+    private bool _inFnuction = false;
+
     private Lexeme MatchToken(SyntaxKind kind)
     {
         Lexeme currentToken = _lexemeQueue.Peek();
@@ -74,6 +76,7 @@ public class SimpleSyntaxParser(
 
     private MemberSyntax ParseFunctionDeclaration()
     {
+        _inFnuction = true;
         Lexeme funk = MatchToken(SyntaxKind.FunkKeyword);
         Lexeme identifier = MatchToken(SyntaxKind.IdentifierToken);
 
@@ -87,14 +90,14 @@ public class SimpleSyntaxParser(
             ParseBlockStatement()
         );
 
-     
+        _inFnuction = false;
         return function;
     }
 
     private ArrayExpressionSyntax ParseArrayExpression()
     {
         return new ArrayExpressionSyntax(
-            
+
             SyntaxKind.ArrayExpression,
             MatchToken(SyntaxKind.OpenBraceToken),
             ParseArguments(SyntaxKind.CloseBraceToken),
@@ -161,6 +164,8 @@ public class SimpleSyntaxParser(
             case SyntaxKind.IfKeyword:
                 return ParseIfStatement();
             case SyntaxKind.ReturnKeyword:
+                if (!_inFnuction)
+                    goto default;
                 return ParseReturnStatement();
             default:
                 return ParseExpressionStatement();
@@ -172,7 +177,7 @@ public class SimpleSyntaxParser(
         var expression = ParseExpression();
         var semicolon = MatchToken(SyntaxKind.SemicolonToken);
         return new ExpressionStatementSyntax(
-            
+
             expression,
             semicolon
         );
@@ -221,7 +226,7 @@ public class SimpleSyntaxParser(
         ExpressionSyntax initializer = typeClause.Type is ArrayTypeSyntax
             ? ParseExpression()
             : ParseBinaryExpression();
-        
+
         var semicolon = MatchToken(SyntaxKind.SemicolonToken);
 
         return new VariableDeclarationSyntax(
@@ -285,7 +290,7 @@ public class SimpleSyntaxParser(
         var statement = ParseStatement();
 
         return new ElseClauseSyntax(
-            
+
             keyword,
             statement
         );
@@ -297,12 +302,11 @@ public class SimpleSyntaxParser(
         ExpressionSyntax? expression = null;
 
         if (_lexemeQueue.Peek().Kind != SyntaxKind.SemicolonToken)
-            expression = ParseExpression();
+            expression = ParseBinaryExpression();
 
         var semicolon = MatchToken(SyntaxKind.SemicolonToken);
 
         return new ReturnStatementSyntax(
-            
             keyword,
             expression,
             semicolon
@@ -316,11 +320,17 @@ public class SimpleSyntaxParser(
             _lexemeQueue.Peek(1).Kind == SyntaxKind.OpenBracketToken)
             return ParseAssignmentExpression();
 
+        return ParseMathExpression();
+    }
+
+    private ExpressionSyntax ParseMathExpression()
+    {
         if (_lexemeQueue.Peek().Kind == SyntaxKind.OpenBraceToken)
             return ParseArrayExpression();
 
         return ParseBinaryExpression();
     }
+    
 
     private ExpressionSyntax ParseAssignmentExpression()
     {
@@ -333,7 +343,7 @@ public class SimpleSyntaxParser(
             var expression = ParseNumberLiteral();
             var closeBracket = MatchToken(SyntaxKind.CloseBracketToken);
             operatorToken = MatchToken(SyntaxKind.EqualsToken);
-            right = ParseExpression();
+            right = ParseMathExpression();
             return new ArrayAssigmentExpressionSyntax(
                 identifierToken,
                 openBracket,
@@ -357,7 +367,7 @@ public class SimpleSyntaxParser(
         {
             var operatorToken = _lexemeQueue.Peek();
             _lexemeQueue.Next();
-            var operand = ParseBinaryExpression(unaryOperatorPrecedence);
+            var operand = ParseBinaryExpression();
             left = new UnaryExpressionSyntax(operatorToken, operand);
         }
         else
@@ -491,7 +501,7 @@ public class SimpleSyntaxParser(
                _lexemeQueue.Peek().Kind != endToken &&
                _lexemeQueue.Peek().Kind != SyntaxKind.EndToken)
         {
-            var expression = ParseBinaryExpression();
+            var expression = ParseMathExpression();
             nodesAndSeparators.Add(expression);
 
             if (_lexemeQueue.Peek().Kind == SyntaxKind.CommaToken)

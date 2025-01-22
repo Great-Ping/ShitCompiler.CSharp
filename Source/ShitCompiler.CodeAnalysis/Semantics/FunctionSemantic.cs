@@ -5,7 +5,7 @@ using ShitCompiler.CodeAnalysis.Syntax;
 using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
 public record FunctionSemantic(
-    DataType ReturnType,
+    TypeInfo ReturnType,
     FunctionDeclarationSyntax Function,
-    List<DataType> argTypes
+    List<TypeInfo> argTypes
 );

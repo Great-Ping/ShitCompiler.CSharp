@@ -26,7 +26,7 @@ namespace ShitCompiler.CodeAnalysis.Semantics
 
         Dictionary<string, FunctionSemantic> mFunctions = new();
 
-        DataType _currentReturnDataType = DataType.Unknown;
+        TypeInfo _currentReturnDataType = DataType.Unknown;
         FunctionDeclarationSyntax _currentFunction;
 
         bool _hasFunctionReturn = false;
@@ -147,8 +147,8 @@ namespace ShitCompiler.CodeAnalysis.Semantics
         {
             CheckIdentifierDeclaration(call, call.Identifier);
 
-            DataType s = _dataTypes[call];
-            if (s == DataType.Unknown) {
+            TypeInfo s = _dataTypes[call];
+            if (s.Type == DataType.Unknown) {
                 return;
             }
 
@@ -177,8 +177,8 @@ namespace ShitCompiler.CodeAnalysis.Semantics
             int i = 0;
             foreach (ExpressionSyntax arg in call.Arguments) {
                 HandleSyntaxNode(arg);
-                DataType argType = _dataTypes[arg];
-                DataType funcArgType = sem.argTypes[i];
+                TypeInfo argType = _dataTypes[arg];
+                TypeInfo funcArgType = sem.argTypes[i];
                 if (argType != funcArgType) {
                     errorsHandler.Handle(
                         new SemanticError(
@@ -210,7 +210,7 @@ namespace ShitCompiler.CodeAnalysis.Semantics
         private void HandleIfStatementCondition(ExpressionSyntax condition)
         {
             HandleSyntaxNode(condition);
-            DataType conditionType = _dataTypes.GetValueOrDefault(condition, DataType.Unknown);
+            TypeInfo conditionType = _dataTypes.GetValueOrDefault(condition, DataType.Unknown);
 
             if (conditionType != DataType.Boolean){
                 errorsHandler.Handle(
@@ -365,12 +365,12 @@ namespace ShitCompiler.CodeAnalysis.Semantics
 
             _symbolTable.CreateNewSymbolBlock();
 
-            List<DataType> argParams = new List<DataType>();
+            List<TypeInfo> argParams = new();
 
             foreach (ParameterSyntax param in funk.Parameters) 
             {
                 Declarate(param.Identifier, param.TypeClause);
-                DataType type = _dataTypes[param.Identifier];
+                TypeInfo type = _dataTypes[param.Identifier];
                 argParams.Add(type);
             }
 
@@ -466,7 +466,7 @@ namespace ShitCompiler.CodeAnalysis.Semantics
             ReturnStatementSyntax ret
         ) {
             _hasFunctionReturn = true;
-            if (_currentReturnDataType == DataType.Unit) {
+            if (_currentReturnDataType.Type == DataType.Unit) {
                 return;
             }
 
@@ -485,7 +485,7 @@ namespace ShitCompiler.CodeAnalysis.Semantics
                 false
             );
 
-            DataType retType = _dataTypes[ret.Expression];
+            TypeInfo retType = _dataTypes[ret.Expression];
             if (retType == _currentReturnDataType) {
                 return;
             }
