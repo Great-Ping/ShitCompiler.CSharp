@@ -20,11 +20,10 @@ namespace ShitCompiler.CodeAnalysis.Semantics
     {
         SymbolTable _symbolTable = new();
         ISyntaxErrorsHandler errorsHandler = errorsHandler;
-        Dictionary<SyntaxNode, DataType> _dataTypes = new();
-
+        Dictionary<SyntaxNode, TypeInfo> _dataTypes = new();
+       
         DataType _currentReturnDataType = DataType.Unknown;
         FunctionDeclarationSyntax _currentFunction;
-
         bool _hasFunctionReturn = false;
 
         public void Parse(CompilationUnitSyntax compilationUnit, bool createScopeInBlock=true) 
@@ -44,6 +43,9 @@ namespace ShitCompiler.CodeAnalysis.Semantics
             {
                 case BinaryExpressionSyntax binaryExpression:
                     HandleBinaryExpression(binaryExpression);
+                    break;
+                case ArrayExpressionSyntax arrayExpression:
+                    HandleArrayExpression(arrayExpression);
                     break;
                 case LiteralExpressionSyntax literal:
                     HandleLiteralExpression(literal);
@@ -76,6 +78,33 @@ namespace ShitCompiler.CodeAnalysis.Semantics
                     HandleSyntaxNodes(node.GetChildren());
                     break;
             };
+        }
+
+        private void HandleArrayExpression(ArrayExpressionSyntax arrayExpression)
+        {
+            foreach (var expression in arrayExpression.Expressions)
+                HandleSyntaxNode(expression);
+
+            var types = arrayExpression.Expressions
+                .Select(x => _dataTypes.GetValueOrDefault(x, DataType.Unknown).Type)
+                .ToHashSet();
+            
+            if (types.Count == 1)
+            {
+                _dataTypes.Add(
+                    arrayExpression,
+                    new TypeInfo(types.First() | DataType.Array, [arrayExpression.Expressions.Count()])
+                );
+                return;    
+            }
+            
+            _dataTypes.Add(arrayExpression, DataType.Unknown);
+            errorsHandler.Handle(
+                new SemanticError(
+                    arrayExpression.Start,
+                    $"Heterogeneous type of array elements"
+                )
+            );
         }
 
         private void HandleCallExpression(CallExpressionSyntax fuctionCall)
@@ -153,7 +182,6 @@ namespace ShitCompiler.CodeAnalysis.Semantics
             Declarate(variable.Identifier, variable.TypeClause);
             HandleSyntaxNode(variable.Initializer);
             PromoteType(variable, variable.Identifier, variable.Initializer);
-            ///TODO TYPE MATCHING
         }
 
         //Обрабатывает объявление какого либо идентификатора в текущем Scope
@@ -172,6 +200,7 @@ namespace ShitCompiler.CodeAnalysis.Semantics
             }
 
             var type = ParseType(typeClause.Type);
+            _dataTypes.Add(identifier, type);
             _symbolTable.AddSymbol(
                 new Symbol(
                     identifier,
@@ -179,20 +208,19 @@ namespace ShitCompiler.CodeAnalysis.Semantics
                     isFunk
                 )
             );
-            _dataTypes.Add(identifier, type.Type);
         }
 
         private void PromoteType(SyntaxNode parent, SyntaxNode left, SyntaxNode right)
         {
-            DataType leftType = _dataTypes.GetValueOrDefault(left, DataType.Unknown);
-            DataType rightType = _dataTypes.GetValueOrDefault(right, DataType.Unknown);
+            TypeInfo leftType = _dataTypes.GetValueOrDefault(left, DataType.Unknown);
+            TypeInfo rightType = _dataTypes.GetValueOrDefault(right, DataType.Unknown);
 
-            if (leftType == rightType) {
+            if (leftType.Equals(rightType)) {
                 _dataTypes.Add(parent, leftType);
                 return;
             }
+            
             _dataTypes.Add(parent,  DataType.Unknown);
-
             errorsHandler.Handle(
                 new SemanticError(
                     parent.Start,
@@ -217,7 +245,8 @@ namespace ShitCompiler.CodeAnalysis.Semantics
             if (type != DataType.Unknown)
                 return type;
 
-            errorsHandler.Handle(new SemanticError(
+            errorsHandler.Handle(
+                new SemanticError(
                 typeIdentifier.Start,
                 $"Unknown data type {typeIdentifier.OriginalValue}"
             ));
@@ -231,13 +260,13 @@ namespace ShitCompiler.CodeAnalysis.Semantics
             {
                 case ArrayTypeSyntax array:
                     return (
-                        MatchTypes(array.Identifier), 
+                        MatchTypes(array.Identifier) | DataType.Array, 
                         [Convert.ToInt32(array.ArraySizeNumber.Value)]
                     );
                 case IdentifierTypeSyntax identifier:
                     return (
                         MatchTypes(identifier.Identifier), 
-                        [0]
+                        []
                     );
                 default:
                     throw new InvalidOperationException();
