@@ -9,6 +9,7 @@ public record Lexeme(
     Location Start
 ) : SyntaxNode(Kind)
 {
+    public override Location Start { get; } = Start;
     public override IEnumerable<ISyntaxNode> GetChildren()
          => [];
 };

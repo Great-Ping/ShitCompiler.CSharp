@@ -9,8 +9,7 @@ public record BinaryExpressionSyntax(
 ) : ExpressionSyntax(SyntaxKind.BinaryExpression) {
     public override IEnumerable<ISyntaxNode> GetChildren()
     {
-        return
-        [
+        return [
             Left,
             Operand,
             Right

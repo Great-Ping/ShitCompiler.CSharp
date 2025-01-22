@@ -9,6 +9,7 @@ using ShitCompiler.CodeAnalysis.Syntax.Errors;
 using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 using ShitCompiler.Widgets;
 using ShitCompiler.CodeAnalysis.Semantics;
+using ShitCompiler.CodeAnalysis.Syntax.ErrorHandlers;
 
 namespace ShitCompiler.Pages;
 
@@ -35,7 +36,7 @@ public partial class MainViewModel : ViewModelBase
             lexems,
             new AccumulatingErrorsHandler(errors)
         );
-        SemanticsParser semanticParser = new(
+        SemanticParser semanticParser = new(
             errosAccumulator
         );
 

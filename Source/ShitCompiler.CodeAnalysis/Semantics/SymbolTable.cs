@@ -1,7 +1,7 @@
 using ShitCompiler.CodeAnalysis.Lexicon;
-using ShitCompiler.CodeAnalysis.Semantics;
+using ShitCompiler.CodeAnalysis.Syntax;
 
-namespace ShitCompiler.CodeAnalysis.Syntax;
+namespace ShitCompiler.CodeAnalysis.Semantics;
 
 public class SymbolTable
 {
@@ -10,7 +10,7 @@ public class SymbolTable
 
     public SymbolTable()
     {
-        var root = new SymbolScope(null, new Dictionary<string, Symbol>());
+        var root = new SymbolScope();
         InitializeBaseTypes(root);
         _root = root;
         _current = root;
@@ -62,8 +62,6 @@ public class SymbolTable
     }
 
 
-    public SymbolScope Current => _current;
-
     public Symbol? Find(string identifier, int location)
     {
         return _current.Find(identifier, location);
@@ -101,6 +99,17 @@ public class SymbolTable
     public void DismissBlock()
     {
         _current = _current.Parent ?? _current;
+    }
+
+    public Symbol CreateTempSymbol(DataType dataType, int initialPosition, int[] arraySize, bool isFunk = false)
+    {
+        return _current.CreateTempSymbol(dataType, initialPosition, arraySize, isFunk);
+    }
+
+
+    public Symbol CreateTempSymbol(DataType dataType, int initialPosition, bool isFunk = false)
+    {
+        return _current.CreateTempSymbol(dataType, initialPosition, isFunk);
     }
 
     public void ResetBlock() 

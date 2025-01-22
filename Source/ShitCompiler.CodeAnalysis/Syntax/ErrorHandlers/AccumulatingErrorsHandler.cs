@@ -1,6 +1,6 @@
 using ShitCompiler.CodeAnalysis.Syntax.Errors;
 
-namespace ShitCompiler.CodeAnalysis.Syntax;
+namespace ShitCompiler.CodeAnalysis.Syntax.ErrorHandlers;
 
 public class AccumulatingErrorsHandler(
     ICollection<ParseError> errors

@@ -1,6 +1,6 @@
 using ShitCompiler.CodeAnalysis.Syntax.Errors;
 
-namespace ShitCompiler.CodeAnalysis.Syntax;
+namespace ShitCompiler.CodeAnalysis.Syntax.ErrorHandlers;
 
 public class ParseException(ParseError error)
     : Exception($"{error.Location.LineIndex}.{error.Location.SymbolIndex}:{error.Message}");

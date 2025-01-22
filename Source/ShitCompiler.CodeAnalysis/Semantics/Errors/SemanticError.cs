@@ -1,7 +1,6 @@
-
-using ShitCompiler.CodeAnalysis.Syntax;
-using ShitCompiler.CodeAnalysis;
 using ShitCompiler.CodeAnalysis.Syntax.Errors;
+
+namespace ShitCompiler.CodeAnalysis.Semantics.Errors;
 
 public class SemanticError(
     Location location,

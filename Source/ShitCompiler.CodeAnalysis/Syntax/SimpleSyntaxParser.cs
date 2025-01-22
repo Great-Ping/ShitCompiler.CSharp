@@ -2,7 +2,9 @@ using System.Collections.Immutable;
 
 using ShitCompiler.CodeAnalysis;
 using ShitCompiler.CodeAnalysis.Lexicon;
+using ShitCompiler.CodeAnalysis.Semantics;
 using ShitCompiler.CodeAnalysis.Syntax;
+using ShitCompiler.CodeAnalysis.Syntax.ErrorHandlers;
 using ShitCompiler.CodeAnalysis.Syntax.Errors;
 using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
@@ -420,34 +422,34 @@ public class SimpleSyntaxParser(
     {
         var isTrue = _lexemeQueue.Peek().Kind == SyntaxKind.TrueKeyword;
         var keywordToken = isTrue ? MatchToken(SyntaxKind.TrueKeyword) : MatchToken(SyntaxKind.FalseKeyword);
-        return new LiteralExpressionSyntax<bool>(keywordToken, isTrue);
+        return new LiteralExpressionSyntax<bool>(keywordToken, DataType.Boolean, isTrue);
     }
     private LiteralExpressionSyntax<double> ParseRealNumberLiteral()
     {
         var token = MatchToken(SyntaxKind.RealNumberToken);
         var numberToken = token as Lexeme<double>;
-        return new LiteralExpressionSyntax<double>(token, numberToken?.ParsedValue ?? 0.0d);
+        return new LiteralExpressionSyntax<double>(token, DataType.Double, numberToken?.ParsedValue ?? 0.0d);
     }
 
     private LiteralExpressionSyntax<long> ParseNumberLiteral()
     {
         var token = MatchToken(SyntaxKind.NumberToken);
         var numberToken = token as Lexeme<long>;
-        return new LiteralExpressionSyntax<long>(token, numberToken?.ParsedValue ?? 0);
+        return new LiteralExpressionSyntax<long>(token, DataType.Long, numberToken?.ParsedValue ?? 0);
     }
 
     private LiteralExpressionSyntax<string> ParseStringLiteral()
     {
         var token = MatchToken(SyntaxKind.StringToken);
         var stringToken = token as Lexeme<string>;
-        return new LiteralExpressionSyntax<string>(token, stringToken?.ParsedValue ?? string.Empty);
+        return new LiteralExpressionSyntax<string>(token, DataType.String, stringToken?.ParsedValue ?? string.Empty);
     }
 
     private ExpressionSyntax ParseCharLiteral()
     {
         var token = MatchToken(SyntaxKind.CharacterToken);
         var charToken = token as Lexeme<char>;
-        return new LiteralExpressionSyntax<char>(token, charToken?.ParsedValue ?? TextCursor.InvalidCharacter);
+        return new LiteralExpressionSyntax<char>(token, DataType.Char, charToken?.ParsedValue ?? TextCursor.InvalidCharacter);
     }
 
     private ExpressionSyntax ParseNameOrCallOrIndexExpression()

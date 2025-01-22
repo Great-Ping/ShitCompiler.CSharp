@@ -6,9 +6,6 @@ public sealed record GlobalStatementSyntax(
 {
     public override IEnumerable<ISyntaxNode> GetChildren()
     {
-        return
-        [
-            Statement
-        ];
+        yield return Statement;
     }
 }

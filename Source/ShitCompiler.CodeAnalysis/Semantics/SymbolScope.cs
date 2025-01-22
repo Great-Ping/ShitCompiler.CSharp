@@ -1,17 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using ShitCompiler.CodeAnalysis.Lexicon;
+﻿using ShitCompiler.CodeAnalysis.Lexicon;
+using ShitCompiler.CodeAnalysis.Syntax;
 
 namespace ShitCompiler.CodeAnalysis.Semantics
 {
-    public record SymbolScope(
-        SymbolScope? Parent,
-        IDictionary<string, Symbol> Symbols
-    ){
+    public class SymbolScope(
+        SymbolScope? parent,
+        IDictionary<string, Symbol> symbols,
+        string id
+    ) {
+        private int _temporarySymbolsCount = 0;
+        private int _childsCount = 0;
+        private SymbolScope? _parent = parent;
+        private IDictionary<string, Symbol> _symbols = symbols;
+        private string _id = id;
+
+        public SymbolScope(SymbolScope? parent = null, string id = "₽")
+            :this(parent, new Dictionary<string, Symbol>(), id)
+        { }
+
+        public string Id => _id;
+        public SymbolScope? Parent => _parent;
+
         public Symbol? Find(Lexeme identifier)
         {
             return Find(identifier.OriginalValue, identifier.Start.AbsoluteIndex);
@@ -24,18 +33,18 @@ namespace ShitCompiler.CodeAnalysis.Semantics
 
         public Symbol? Find(string identifier, int position)
         {
-            if (!Symbols.TryGetValue(identifier, out Symbol? value))
-                return Parent?.Find(identifier, position);
+            if (!_symbols.TryGetValue(identifier, out Symbol? value))
+                return _parent?.Find(identifier, position);
 
             if (value.InitLocation > position)
-                return Parent?.Find(identifier, position);
+                return _parent?.Find(identifier, position);
 
             return value;
         }
 
         public Symbol? FindInBlock(string identifier, int location)
         {
-            if (!Symbols.TryGetValue(identifier, out Symbol? value))
+            if (!_symbols.TryGetValue(identifier, out Symbol? value))
                 return null;
 
             if (value.InitLocation > location)
@@ -46,12 +55,32 @@ namespace ShitCompiler.CodeAnalysis.Semantics
 
         public void AddSymbol(Symbol lexeme)
         {
-            Symbols.TryAdd(lexeme.Name, lexeme);
+            _symbols.TryAdd(lexeme.Name, lexeme);
         }
 
         public SymbolScope CreateChild()
         {
-            return new SymbolScope(this, new Dictionary<string, Symbol>());
+            _childsCount++;
+            return new SymbolScope(this, id + $"-c{_childsCount}");
+        }
+
+        public Symbol CreateTempSymbol(DataType dataType, int initLocation, bool isFunk = false)
+        {
+            return CreateTempSymbol(dataType, initLocation, [], isFunk);
+        }
+
+        public Symbol CreateTempSymbol(DataType dataType, int initLocation, int[] arraySize, bool isFunk = false)
+        {
+            _temporarySymbolsCount++;
+            Symbol temp = new Symbol(
+                _id + $"{_temporarySymbolsCount}",
+                initLocation,
+                dataType,
+                arraySize,
+                isFunk                
+            );
+            AddSymbol(temp);
+            return temp;
         }
     };
 

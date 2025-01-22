@@ -1,4 +1,4 @@
-namespace ShitCompiler.CodeAnalysis.Syntax;
+namespace ShitCompiler.CodeAnalysis.Semantics;
 
 public enum DataType
 {

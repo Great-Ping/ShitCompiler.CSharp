@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -10,9 +10,13 @@ using ShitCompiler.CodeAnalysis.Lexicon;
 using ShitCompiler.CodeAnalysis.Syntax;
 using ShitCompiler.CodeAnalysis.Syntax.SyntaxNodes;
 
+using ShitCompiler.CodeAnalysis;
+using ShitCompiler.CodeAnalysis.Semantics.Errors;
+using ShitCompiler.CodeAnalysis.Syntax.ErrorHandlers;
+
 namespace ShitCompiler.CodeAnalysis.Semantics
 {
-    public class SemanticsParser(ISyntaxErrorsHandler errorsHandler)
+    public class SemanticParser(ISyntaxErrorsHandler errorsHandler)
     {
         SymbolTable _symbolTable = new();
         ISyntaxErrorsHandler errorsHandler = errorsHandler;
@@ -32,16 +36,13 @@ namespace ShitCompiler.CodeAnalysis.Semantics
 
         private void HandleSyntaxNode(ISyntaxNode node, bool createScopeInBlock=true)
         {
-             switch (node)
+            switch (node)
             {
-                case LiteralExpressionSyntax literal:
-                    HandleLiteralExpression(literal);
-                    break;
-                case ArrayExpressionSyntax array:
-                    HandleArrayExpression(array);
-                    break;
                 case BinaryExpressionSyntax binaryExpression:
                     HandleBinaryExpression(binaryExpression);
+                    break;
+                case LiteralExpressionSyntax literal:
+                    HandleLiteralExpression(literal);
                     break;
                 case FunctionDeclarationSyntax functionDeclaration:
                     HandleFunctionDeclaration(functionDeclaration);
@@ -58,16 +59,27 @@ namespace ShitCompiler.CodeAnalysis.Semantics
                 case BlockStatementSyntax block:
                     HandleBlockStatement(block, createScope: createScopeInBlock);
                     break;
+                case NameExpressionSyntax name:
+                    HandleNameExpression(name);
+                    break;
+                case CallExpressionSyntax fuctionCall:
+                    HandleCallExpression(fuctionCall);
+                    break;
                 default:
                     HandleSyntaxNodes(node.GetChildren());
                     break;
-            }
+            };
+        }
+
+        private void HandleCallExpression(CallExpressionSyntax fuctionCall)
+        {
+            CheckIdentifierDeclaration(fuctionCall, fuctionCall.Identifier);
         }
 
         private void HandleIfStatement(IfStatementSyntax ifStatement)
         {
             _symbolTable.CreateNewSymbolBlock();
-            HandleIfstatementCondition(ifStatement.Condition);
+            HandleIfStatementCondition(ifStatement.Condition);
             HandleSyntaxNode(ifStatement.ThenStatement, false);
             _symbolTable.DismissBlock();
 
@@ -79,10 +91,19 @@ namespace ShitCompiler.CodeAnalysis.Semantics
             _symbolTable.DismissBlock();
         }
 
-        private void HandleIfstatementCondition(ExpressionSyntax condition)
+        private void HandleIfStatementCondition(ExpressionSyntax condition)
         {
-            
-            throw new NotImplementedException();
+            HandleSyntaxNode(condition);
+            DataType conditionType = _dataTypes.GetValueOrDefault(condition, DataType.Unknown);
+
+            if (conditionType != DataType.Boolean){
+                errorsHandler.Handle(
+                    new SemanticError(
+                        condition.Start,
+                        "Waited boolean expression."
+                    )
+                );
+            }
         }
 
         private void HandleBlockStatement(BlockStatementSyntax block, bool createScope = false)
@@ -123,6 +144,8 @@ namespace ShitCompiler.CodeAnalysis.Semantics
         private void HandleVariable(VariableDeclarationSyntax variable)
         {
             Declarate(variable.Identifier, variable.TypeClause);
+            HandleSyntaxNode(variable.Initializer);
+            PromoteType(variable, variable.Identifier, variable.Initializer);
             ///TODO TYPE MATCHING
         }
 
@@ -130,24 +153,45 @@ namespace ShitCompiler.CodeAnalysis.Semantics
         private void Declarate(Lexeme identifier, TypeClauseSyntax typeClause, bool isFunk=false)
         {
             Symbol? symbol = _symbolTable.FindInBlock(identifier);
-            if (symbol == null) 
+            if (symbol != null) 
             {
-                _symbolTable.AddSymbol(
-                    new Symbol(
-                        identifier,
-                        ParseType(typeClause.Type),
-                        isFunk
+                errorsHandler.Handle(
+                    new SemanticError(
+                        identifier.Start,
+                        $"The symbol variable has already been declared in this scope {identifier.OriginalValue}"
                     )
                 );
                 return;
             }
 
-            errorsHandler.Handle(
-                new SemanticError(
-                    identifier.Start,
-                    $"The symbol variable has already been declared in this scope {identifier.OriginalValue}"
+            var type = ParseType(typeClause.Type);
+            _symbolTable.AddSymbol(
+                new Symbol(
+                    identifier,
+                    type,
+                    isFunk
                 )
             );
+            _dataTypes.Add(identifier, type.Type);
+        }
+
+        private void PromoteType(SyntaxNode parent, SyntaxNode left, SyntaxNode right)
+        {
+            DataType leftType = _dataTypes.GetValueOrDefault(left, DataType.Unknown);
+            DataType rightType = _dataTypes.GetValueOrDefault(right, DataType.Unknown);
+
+            if (leftType == rightType) {
+                _dataTypes.Add(parent, leftType);
+                return;
+            }
+            _dataTypes.Add(parent,  DataType.Unknown);
+
+            errorsHandler.Handle(
+                new SemanticError(
+                    parent.Start,
+                    $"Type mismatch. Left type - {leftType}. Right type - {rightType}"
+                )
+            );            
         }
 
         private DataType MatchTypes(Lexeme typeIdentifier)
@@ -193,11 +237,6 @@ namespace ShitCompiler.CodeAnalysis.Semantics
             }
         }
 
-        private void HandleArrayExpression(ArrayExpressionSyntax array)
-        {
-            
-        }
-
         private void HandleFunctionDeclaration(FunctionDeclarationSyntax funk)
         {
             Declarate(funk.Identifier, funk.TypeClause, true);
@@ -217,16 +256,53 @@ namespace ShitCompiler.CodeAnalysis.Semantics
             HandleSyntaxNode(funk.Block, false);
             _symbolTable.DismissBlock();
         }
-
+        
         private void HandleBinaryExpression(BinaryExpressionSyntax binaryExpression)
         {
-            // throw new NotImplementedException();
+            HandleSyntaxNode(
+                binaryExpression.Left
+            );
+
+            HandleSyntaxNode(
+                binaryExpression.Right
+            );
+
+            PromoteType(binaryExpression, binaryExpression.Left, binaryExpression.Right);           
+        }
+
+        private void HandleNameExpression(
+            NameExpressionSyntax name
+        ) 
+        {
+            CheckIdentifierDeclaration(name, name.Identifier);
+        }
+
+        private void CheckIdentifierDeclaration(SyntaxNode parent, Lexeme identifier)
+        {
+            Symbol? found = _symbolTable.Find(
+                identifier
+            );
+
+            if (found != null){
+                _dataTypes.Add(parent, found.DataType);
+                return;
+            }
+
+            _dataTypes.Add(parent, DataType.Unknown);
+            errorsHandler.Handle(
+                new SemanticError(
+                    parent.Start,
+                    $"Identifier not found {identifier.OriginalValue}."
+                )
+            );
         }
 
         private void HandleLiteralExpression(LiteralExpressionSyntax literal)
         {
-
+            _dataTypes.Add(
+                literal,
+                literal.Type
+            );
         }
-
     }
 }
