@@ -26,11 +26,16 @@ namespace ShitCompiler.CodeAnalysis.Syntax;
                 case SyntaxKind.PlusToken:
                 case SyntaxKind.MinusToken:
                     return 3;
-
+                
                 case SyntaxKind.ExclamationEqualsToken:
                 case SyntaxKind.EqualsEqualsToken:
+                case SyntaxKind.GreaterThanToken:
+                case SyntaxKind.GreaterThanEqualsToken:
+                case SyntaxKind.LessThanToken:
+                case SyntaxKind.LessThanEqualsToken:
                     return 2;
-
+                
+                case SyntaxKind.BarBarToken:
                 case SyntaxKind.AmpersandAmpersandToken:
                     return 1;
 

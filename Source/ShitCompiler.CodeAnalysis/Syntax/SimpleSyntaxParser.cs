@@ -29,6 +29,16 @@ public class SimpleSyntaxParser(
             return currentToken;
         }
 
+        if (currentToken is BadLexeme badLexeme)
+        {
+            _errorsHandler.Handle(new UnexpectedTokenError(
+                badLexeme.Start,
+                $"Received bad token. {badLexeme.ErrorCode}."
+            ));
+            _lexemeQueue.Next();
+            return MatchToken(kind);
+        }
+
         _errorsHandler.Handle(new UnexpectedTokenError(
             currentToken.Start,
             $"Waited: {kind} Returned: {currentToken.Kind}"
@@ -97,7 +107,6 @@ public class SimpleSyntaxParser(
     private ArrayExpressionSyntax ParseArrayExpression()
     {
         return new ArrayExpressionSyntax(
-
             SyntaxKind.ArrayExpression,
             MatchToken(SyntaxKind.OpenBraceToken),
             ParseArguments(SyntaxKind.CloseBraceToken),
@@ -152,7 +161,7 @@ public class SimpleSyntaxParser(
         );
     }
 
-    private StatementSyntax ParseStatement()
+    private StatementSyntax  ParseStatement()
     {
         switch (_lexemeQueue.Peek().Kind)
         {
@@ -177,7 +186,6 @@ public class SimpleSyntaxParser(
         var expression = ParseExpression();
         var semicolon = MatchToken(SyntaxKind.SemicolonToken);
         return new ExpressionStatementSyntax(
-
             expression,
             semicolon
         );

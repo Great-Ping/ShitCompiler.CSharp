@@ -38,4 +38,8 @@
     <ItemGroup>
       <ProjectReference Include="..\..\ShitCompiler.CodeAnalysis\ShitCompiler.CodeAnalysis.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Shared\Theme\" />
+    </ItemGroup>
 </Project>
